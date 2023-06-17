@@ -14,6 +14,26 @@ const routes: Routes = [
     path: 'home',
     loadChildren: () => import('./Pages/home/home.module').then(m => m.HomeModule), 
     canActivate: [AuthGuard]
+  },
+  {
+    path: 'modo-venda',
+    loadChildren: () => import('./Pages/modo-venda/modo-venda.module').then(m => m.ModoVendaModule), 
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'products',
+    loadChildren: () => import('./Pages/products/products.module').then(m => m.ProductsModule), 
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'dashboard',
+    loadChildren: () => import('./Pages/dashboard/dashboard.module').then(m => m.DashboardModule), 
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'user',
+    loadChildren: () => import('./Pages/user/user.module').then(m => m.UserModule), 
+    canActivate: [AuthGuard]
   }
 ];
 
