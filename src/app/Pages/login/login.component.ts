@@ -7,21 +7,15 @@ import { AuthService } from '@auth0/auth0-angular';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit{
+export class LoginComponent {
+
   constructor(
-    private authService: AuthService,
-    private router: Router,
-      
-  ) { 
-  }
-  ngOnInit(): void{
-    if(this.authService.isAuthenticated$){
-      this.router.navigate(['/home']);
-    } else{
-      this.authService.error$
-    }
+    private router: Router
+  ){
+
   }
   login(): void{
-    this.authService.loginWithRedirect();
+    this.router.navigate(['/home']);
   }
+  
 }

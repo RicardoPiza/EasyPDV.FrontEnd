@@ -1,5 +1,6 @@
 import { DOCUMENT } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { AuthService } from '@auth0/auth0-angular';
 import { ProductService } from 'src/app/@core/services/product.service';
 @Component({
@@ -7,14 +8,23 @@ import { ProductService } from 'src/app/@core/services/product.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit{
 constructor(
   private productService: ProductService,
   public auth: AuthService,
-    @Inject(DOCUMENT) 
-    public document: Document
+  @Inject(DOCUMENT) 
+  public document: Document,
+  private router: Router
 ){
 
+}
+
+ngOnInit(): void{
+  if(this.auth.isAuthenticated$){
+    this.router.navigate(['/home']);
+  } else{
+    this.router.navigate(['/login']);
+  }
 }
 addProduct(){
   let product = {

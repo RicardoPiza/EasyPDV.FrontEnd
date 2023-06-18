@@ -4,6 +4,11 @@ import { ProductsRoutingModule } from './products-routing.module';
 import { ThemeModule } from 'src/app/@core/shared/theme/theme.module';
 import { PanelComponent } from './panel/panel.component';
 import { DetailsComponent } from './details/details.component';
+import { MatTableModule } from '@angular/material/table';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+
+
 
 
 @NgModule({
@@ -14,7 +19,10 @@ import { DetailsComponent } from './details/details.component';
   imports: [
     CommonModule,
     ProductsRoutingModule,
-    ThemeModule
+    ThemeModule,
+    MatTableModule,
+    MatPaginatorModule,
+    MatSortModule
   ]
 })
 export class ProductsModule { }
