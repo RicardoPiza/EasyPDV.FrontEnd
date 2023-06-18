@@ -16,4 +16,10 @@ export class ProductService {
   postProduct(parameters: any): Observable<any> {
     return this.securityRequestService.post(`${environment.webAppApi}/Product/Add`, parameters);
   }
+  listProducts(parameters: any): Observable<any> {
+    return this.securityRequestService.post(`${environment.webAppApi}/Product/List`, parameters);
+  }
+  removeProduct(parameters: any): Observable<any> {
+    return this.securityRequestService.post(`${environment.webAppApi}/Product/Remove`, parameters);
+  }
 }
