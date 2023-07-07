@@ -4,6 +4,8 @@ import { FooterComponent } from './footer/footer.component';
 import { NavbarComponent } from './navbar/navbar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { RouterModule } from '@angular/router';
+import { FixedPluginModule } from './fixedplugin/fixedplugin.module';
+import { SpinnerComponent } from './spinner/spinner.component';
 
 
 
@@ -11,16 +13,19 @@ import { RouterModule } from '@angular/router';
   declarations: [
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    SpinnerComponent,
   ],
   imports: [
     CommonModule,
-    RouterModule
+    RouterModule,
+    FixedPluginModule
   ],
   exports: [
     FooterComponent,
     NavbarComponent,
-    SidebarComponent
+    SidebarComponent,
+    SpinnerComponent
   ]
 })
 export class ThemeModule { }

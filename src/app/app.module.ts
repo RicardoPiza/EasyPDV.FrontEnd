@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { AuthModule, AuthService } from '@auth0/auth0-angular';
 import { HttpClientModule } from '@angular/common/http';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ToastrModule } from 'ngx-toastr';
 
 
 @NgModule({
@@ -16,6 +17,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
     AppRoutingModule,
     HttpClientModule,
     BrowserAnimationsModule,
+    ToastrModule.forRoot({
+      positionClass: 'toast-top-center'
+    }),
     AuthModule.forRoot({
       domain: 'dev-45cr7h6fi351b8w1.us.auth0.com',
       clientId: 'LZiOO0SDH1vtHcGdArrRh7ExvzGrXa9a',

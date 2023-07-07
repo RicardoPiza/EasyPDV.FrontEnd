@@ -1,4 +1,14 @@
 <div class="sidebar-wrapper">
+    <div class="logo">
+        <a href="https://github.com/RicardoPiza/EasyPDV.FrontEnd" class="simple-text logo-mini">
+          <div class="logo-image-small">
+            <img src="assets/img/logo-no-background2.png">
+          </div>
+        </a>
+        <a href="https://github.com/RicardoPiza/EasyPDV.FrontEnd" class="simple-text logo-normal">
+          Easy Dev
+        </a>
+      </div>
       <ul class="nav">
           <li *ngFor="let menuItem of menuItems" routerLinkActive="active" class="{{menuItem.class}}">
               <a [routerLink]="[menuItem.path]">

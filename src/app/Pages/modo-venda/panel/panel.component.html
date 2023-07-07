@@ -1,11 +1,40 @@
-<div class="main-panel">
-    <app-navbar></app-navbar>
-    <div class="content">
-    </div>
-</div>
-
-  <div class="wrapper">
-    <div class="sidebar" data-color="black" data-active-color="danger" >
+<app-spinner></app-spinner>
+<div class="wrapper">
+    <div class="sidebar" data-color="black" data-active-color="danger">
         <app-sidebar></app-sidebar>
+    </div>
+    <div class="main-panel">
+        <app-navbar></app-navbar>
+        <div class="content">
+            <div class="container">
+                <div class="row row-cols-2 row-cols-md-5 align-self-center">
+                    <div class="col mt-2" *ngFor="let product of data ">
+                        <div class="card card-product">
+                            <div class="row text-center">
+                                <div class="col">
+                                    <img class="card-img-top" [src]="product.image" alt="image">
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <h5 class="card-title text-center">{{product.name}}</h5>
+                                <p class="card-text text-center">{{product.description +" - R$"+ product.price}}</p>
+                                <div class="row text-center">
+                                </div>
+                            </div>
+                            <div class="text-center " style="width: 30%; margin: auto;padding-bottom: 10px;">
+                                <label for="itemsQtity" class="form-label">Quantidade</label>
+                                <input type="number" id="itemsQtity" class="form-control form-control-sm text-center" max="50">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <button mat-fab (click)="sale()" aria-label="Adicionar" title="Realizar venda"
+                    class="example-button-container">
+                    <mat-icon class="button-add">check</mat-icon>
+                </button>
+            </div>
+        </div>
     </div>
 </div>
