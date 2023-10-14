@@ -6,34 +6,196 @@
     <div class="main-panel">
         <app-navbar></app-navbar>
         <div class="content">
-            <div class="container">
-                <div class="row row-cols-2 row-cols-md-5 align-self-center">
-                    <div class="col mt-2" *ngFor="let product of data ">
-                        <div class="card card-product">
-                            <div class="row text-center">
+
+            <div class="row" *ngIf="this.formEvent.value.cashierStatus == 0">
+                <h1 class="title text-center">Modo Venda</h1>
+                <h5 class="text-center">Evento ativo: {{this.formEvent.value.name}}</h5>
+            </div>
+            <h1 class="title text-center" *ngIf="this.formEvent.value.cashierStatus == 1">O caixa se encontra fechado no
+                momento</h1>
+            <ng-template #content let-modal>
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal-basic-title">Realizar venda</h4>
+                    <button type="button" class="btn-close" aria-label="Close"
+                        (click)="modal.dismiss('Cross click')"></button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="form">
+                        <div class="mb-5">
+                            <div class="row">
                                 <div class="col">
-                                    <img class="card-img-top" [src]="product.image" alt="image">
+                                    <label for="paymentMethod" class="form-label">Meio de pagamento</label>
+                                    <select class="form-select form-select-sm" id="paymentMethod"
+                                        formControlName="paymentMethod">
+                                        <option value="Credito">Crédito</option>
+                                        <option value="Debito">Débito</option>
+                                        <option value="Dinheiro">Dinheiro</option>
+                                        <option value="Pix">Pix</option>
+                                    </select>
                                 </div>
-                            </div>
-                            <div class="card-body">
-                                <h5 class="card-title text-center">{{product.name}}</h5>
-                                <p class="card-text text-center">{{product.description +" - R$"+ product.price}}</p>
-                                <div class="row text-center">
-                                </div>
-                            </div>
-                            <div class="text-center " style="width: 30%; margin: auto;padding-bottom: 10px;">
-                                <label for="itemsQtity" class="form-label">Quantidade</label>
-                                <input type="number" id="itemsQtity" class="form-control form-control-sm text-center" max="50">
                             </div>
                         </div>
+                    </form>
+                </div>
+                <p>Descritivo de venda</p>
+
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Produto</th>
+                            <th scope="col">Preço</th>
+                            <th scope="col">Quantidade</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let product of activeChosenProducts; index as i">
+                            <th scope="row">{{ i + 1 }}</th>
+                            <td>
+                                <img [src]="'data:image/*;base64,' + product.image" class="me-2" style="width: 25px" />
+                                {{ product.name }}
+                            </td>
+                            <td>{{ product.price | number }}</td>
+                            <td>{{ product.productQuantity | number }}</td>
+                        </tr>
+                        <tr>
+
+                        </tr>
+                        <tr>
+                            <td>
+                            </td>
+                            <td></td>
+                            <th scope="row">Total</th>
+                            <td>{{'R$' + total}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" (click)="submit()">Realizar venda</button>
+                </div>
+            </ng-template>
+
+            <ng-template #openEvent let-modal>
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal-basic-title">Iniciar evento</h4>
+                    <button type="button" class="btn-close" aria-label="Close"
+                        (click)="modal.dismiss('Cross click')"></button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="formEvent">
+                        <div class="mb-5">
+                            <div class="row">
+                                <div class="col">
+                                    <label for="event-name" class="form-label">Nome do evento</label>
+                                    <input class="form-control" type="text" formControlName="name" id="event-name">
+                                </div>
+                                <div class="col">
+                                    <label for="initial-balance" class="form-label">Balanço inicial</label>
+                                    <input class="form-control" type="number" formControlName="balance"
+                                        id="initial-balance">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" (click)="startEvent()">Iniciar evento</button>
+                </div>
+            </ng-template>
+
+            <ng-template #closeEvent let-modal style="z-index: 3;">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modal-basic-title">Terminar evento</h4>
+                    <button type="button" class="btn-close" aria-label="Close"
+                        (click)="modal.dismiss('Cross click')"></button>
+                </div>
+                <div class="modal-body">
+                    <form [formGroup]="formEvent">
+                        <div class="mb-5">
+                            <div class="row">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">Nome do evento</th>
+                                            <th scope="col">Responsável</th>
+                                            <th scope="col">Total das vendas</th>
+                                            <th scope="col">Data</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>{{this.eventResult?.eventName}}</td>
+                                            <td>{{this.eventResult?.responsible}}</td>
+                                            <td>{{this.eventResult?.total}}</td>
+                                            <td>{{this.eventResult?.date | date:'dd-MM-yyyy'}}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-dark" (click)="stopEvent()">Terminar evento</button>
+                </div>
+            </ng-template>
+
+            <div class="container" *ngIf="this.formEvent.value.cashierStatus == 0">
+                <div class="row row-cols-2 row-cols-md-5 align-self-center">
+                    <div class="col mt-2" *ngFor="let product of data;let i = index ">
+                        <form [formGroup]="formProduct">
+                            <div class="card card-product">
+                                <div class="row text-center">
+                                    <div class="col">
+                                        <img class="card-img-top" [src]="'data:image/*;base64,' + product.image"
+                                            alt="image">
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title text-center">{{product.name}}</h5>
+                                    <p class="card-text text-center">{{product.description +" - R$"+ product.price}}
+                                    </p>
+                                    <div class="row text-center">
+                                    </div>
+                                </div>
+                                <div class="text-center " style="width: 30%; margin: auto;padding-bottom: 10px;">
+                                    <label for="itemsQtity" class="form-label">Quantidade</label>
+                                    <input type="number" id="itemsQtity" [id]="product.id"
+                                        class="form-control form-control-sm text-center" max="50">
+                                </div>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
             <div>
-                <button mat-fab (click)="sale()" aria-label="Adicionar" title="Realizar venda"
-                    class="example-button-container">
-                    <mat-icon class="button-add">check</mat-icon>
-                </button>
+                <table class="buttonTable">
+                    <tr>
+                        <td>
+                            <button mat-fab (click)="open(content)" aria-label="Adicionar" title="Realizar venda"
+                                class="example-button-container">
+                                <mat-icon class="button-add">attach_money</mat-icon>
+                            </button>
+                        </td>
+                        <td>
+                            <button mat-fab (click)="open(openEvent)" aria-label="Adicionar" title="Novo Evento"
+                                class="example-button-container" *ngIf="this.formEvent.value.cashierStatus == 1">
+                                <mat-icon class="button-add">today</mat-icon>
+                            </button>
+                        </td>
+                        <td>
+                            <button mat-fab (click)="openStopEvent(closeEvent)" aria-label="Adicionar"
+                                title="Terminar evento" class="example-button-container"
+                                *ngIf="this.formEvent.value.cashierStatus == 0">
+                                <mat-icon class="button-add">free_cancellation</mat-icon>
+                            </button>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
             </div>
         </div>
     </div>

@@ -62,20 +62,22 @@ export class PanelComponent implements OnInit, AfterViewInit {
     });
   }
 
-  submit(): void {
+  submit(content: any): void {
     this.loadingService.setLoading(true);
     if (this.form.value.id == '00000000-0000-0000-0000-000000000000') {
       this.productService.postProduct(this.form.value)
         .subscribe(response => {
           if (response.success) {
             this.form.patchValue(response.data.result);
-            this.ngAfterViewInit();
-            this.toastr.success('Produto adicionado com sucesso');
+            this.toastr.success('Produto adicionado com sucesso, Agora, selecione uma imagem');
             this.loadingService.setLoading(false);
-          } else {
-            this.toastr.error('Erro ao adicionar produto');
+            this.modalService.dismissAll();
+            this.getProduct(response.data.result.id, content);
+          } else{
+            this.toastr.success('erro ao adicionar produto');
             this.loadingService.setLoading(false);
-          }
+            this.modalService.dismissAll();
+          } 
         });
     } else {
       this.productService.updateProduct(this.form.value)
@@ -91,8 +93,8 @@ export class PanelComponent implements OnInit, AfterViewInit {
           }
         });
     }
-    this.modalService.dismissAll();
   }
+
   private getParametros(): any {
     let params = {
       price: 0,
@@ -115,8 +117,9 @@ export class PanelComponent implements OnInit, AfterViewInit {
     this.productService.removeProduct(id)
       .subscribe((response) => {
         if (response.success) {
-          this.form.patchValue(response.data.result);
           this.data.splice(response.data.result, 1);
+          this.ngOnInit();
+          this.ngAfterViewInit();
           this.toastr.warning('Produto excluído');
           this.loadingService.setLoading(false);
         } else {
@@ -124,16 +127,30 @@ export class PanelComponent implements OnInit, AfterViewInit {
           this.loadingService.setLoading(false);
         }
       });
-    this.ngAfterViewInit();
     this.modalService.dismissAll();
   }
 
 
   open(content: any) {
     this.ngOnInit();
+    this.ngAfterViewInit();
     this.modalService.open(content, {
       ariaLabelledBy: 'modal-basic-title',
       size: 'xl',
+    }).result.then(
+      (result) => {
+        this.closeResult = `Closed with: ${result}`;
+      },
+      (reason) => {
+        this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
+      },
+    );
+  }
+  openImageSelect(content: any) {
+    this.ngOnInit();
+    this.modalService.open(content, {
+      ariaLabelledBy: 'modal-basic-title',
+      size: 'm',
     }).result.then(
       (result) => {
         this.closeResult = `Closed with: ${result}`;
@@ -197,5 +214,4 @@ export class PanelComponent implements OnInit, AfterViewInit {
       });
     this.modalService.dismissAll();
   }
-
 }

@@ -6,6 +6,7 @@
   <div class="main-panel">
     <app-navbar></app-navbar>
     <div class="content">
+      <h1 class="title text-center ">Cadastro de produtos</h1>
       <ng-template #content let-modal>
         <div class="modal-header">
           <h4 class="modal-title" id="modal-basic-title">Adicionar produto</h4>
@@ -16,12 +17,12 @@
             <div class="mb-5">
               <div class="row">
                 <div class="col">
-                  <label for="price" class="form-label">Preço</label>
-                  <input id="price" class="form-control" formControlName="price" />
-                </div>
-                <div class="col">
                   <label for="name" class="form-label">Nome do produto</label>
                   <input id="name" class="form-control" formControlName="name" />
+                </div>
+                <div class="col">
+                  <label for="price" class="form-label">Preço</label>
+                  <input id="price" class="form-control" formControlName="price" />
                 </div>
                 <div class="col" [hidden]="(form.value.id === '00000000-0000-0000-0000-000000000000')">
                   <label for="image" class="form-label">Imagem</label>
@@ -49,7 +50,7 @@
           </form>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-dark" (click)="submit()">Salvar</button>
+          <button type="button" class="btn btn-outline-dark" (click)="submit(content)">Salvar</button>
         </div>
       </ng-template>
 

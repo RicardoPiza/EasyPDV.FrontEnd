@@ -38,7 +38,7 @@ export class NavbarComponent {
       var navbar : HTMLElement = this.element.nativeElement;
       this.authService.user$.subscribe(user => {
         this.accountName   = user?.name;
-      });;
+      });
       this.toggleButton = navbar.getElementsByClassName('navbar-toggle')[0];
       this.router.events.subscribe((event) => {
         this.sidebarClose();
