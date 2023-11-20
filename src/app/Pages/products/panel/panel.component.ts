@@ -57,7 +57,7 @@ export class PanelComponent implements OnInit, AfterViewInit {
       image: ['', Validators.required],
       name: ['', Validators.required],
       stockQuantity: [],
-      status: ['', Validators.required],
+      status: [''],
       description: ['', Validators.required],
     });
   }

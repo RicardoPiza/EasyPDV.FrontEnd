@@ -24,7 +24,7 @@
                   <label for="price" class="form-label">Preço</label>
                   <input id="price" class="form-control" formControlName="price" />
                 </div>
-                <div class="col" [hidden]="(form.value.id === '00000000-0000-0000-0000-000000000000')">
+                <div class="col" *ngIf="(form.value.id !== '00000000-0000-0000-0000-000000000000')">
                   <label for="image" class="form-label">Imagem</label>
                   <input type="file" class="form-control" (change)="handleFileInput($event)" />
                 </div>
@@ -37,7 +37,7 @@
                 <div class="col">
                   <label for="status" class="form-label">Status</label>
                   <select class="form-select form-select-sm" id="status" formControlName="status">
-                    <option value="Ativo">Ativo</option>
+                    <option value="Ativo" [selected]="true">Ativo</option>
                     <option value="Inativo">Inativo</option>
                   </select>
                 </div>
@@ -71,6 +71,8 @@
             <div class="card-body">
               <h5 class="card-title text-center">{{product.name}}</h5>
               <p class="card-text text-center">{{product.description +" - R$"+ product.price}}</p>
+              <p class="card-text text-center statusActive" *ngIf="product.status == 'Ativo'">{{product.status}}</p>
+              <p class="card-text text-center statusInactive" *ngIf="product.status == 'Inativo'">{{product.status}}</p>
               <div class="row text-center">
                 <div class="col">
                   <a (click)="openConfirmation(confirmContent)" title="Remover">

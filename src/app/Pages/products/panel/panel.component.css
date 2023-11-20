@@ -79,3 +79,13 @@
     width: auto;
     height: auto;
 }
+.statusInactive{
+    color:rgb(250, 80, 58);
+    font-size: 1.2em;
+    font-weight: bold;
+}
+.statusActive{
+    color:rgb(70, 212, 70);
+    font-size: 1.2em;
+    font-weight: bold;
+}

@@ -44,21 +44,21 @@ export class PanelComponent {
     public authService: AuthService
   ) {
     config.backdrop = 'static';
-    
+
   }
 
   ngAfterViewInit(): void {
     this.getData();
   }
-  getData(){
-    
+  getData() {
+
     this.data.splice(0);
     let params = this.getParametros();
     this.loadingService.setLoading(true);
     this.productService
       .listProducts(params)
       .subscribe((response) => {
-        if (response.success){
+        if (response.success) {
           this.activeProducts = response.data.result.products.filter((x: { status: string; }) => x.status == 'Ativo');
           for (var i = 0; i < this.activeProducts.length; i++) {
             this.data.push({
@@ -73,25 +73,25 @@ export class PanelComponent {
             });
             this.form.value.SoldProducts = this.data;
           }
-          
-        this.dataSource = new MatTableDataSource<any>(this.data);
-        this.loadingService.setLoading(false);
-      }
-      this.getEvent();
-      });this.authService.user$.subscribe(user => {
-        this.accountName   = user?.name;
+
+          this.dataSource = new MatTableDataSource<any>(this.data);
+          this.loadingService.setLoading(false);
+        }
+        this.getEvent();
+      }); this.authService.user$.subscribe(user => {
+        this.accountName = user?.name;
       });
 
   }
 
   ngOnInit() {
     this.form = this.formBuilder.group({
-    id:['00000000-0000-0000-0000-000000000000'], 
-    SoldProducts:[[]], 
-    salePrice:[0], 
-    saleDate:[Date.now], 
-    paymentMethod:[''],
-    saleType: [0],
+      id: ['00000000-0000-0000-0000-000000000000'],
+      SoldProducts: [[]],
+      salePrice: [0],
+      saleDate: [Date.now],
+      paymentMethod: [''],
+      saleType: [0],
     });
 
     this.formProduct = this.formBuilder.group({
@@ -133,39 +133,49 @@ export class PanelComponent {
     };
     return params;
   }
-  submit():void {
+  submit(): void {
     this.form.value.SalePrice = this.total;
     this.formEvent.value.responsible = this.accountName;
     this.formEvent.value.sales.push(this.form.value);
     this.form.value.SoldProducts = this.activeChosenProducts;
     this.saleService.postSale(this.formEvent.value)
-    .subscribe((result) =>{
-      if(result.success){
-        this.toastr.success('Venda realizada com sucesso');
-      }else{
-        this.toastr.error('Erro ao realizar a venda');
-      }
-    });
-    this.modalService.dismissAll();
+      .subscribe((result) => {
+        if (result.success) {
+          this.toastr.success('Venda realizada com sucesso');
+          this.modalService.dismissAll();
+        } else {
+          result.errors.forEach((element: any) => {
+            this.toastr.error(element);
+          });
+        }
+      });
     this.ngOnInit();
     this.ngAfterViewInit();
     this.formProduct.value.productQuantity = 0;
   }
-  open(content: any) {    
+
+  sell(content: any){
+
     for (var i = 0; i < this.activeProducts.length; i++) {
       this.data[i].productQuantity = (<HTMLInputElement>document.getElementById(this.activeProducts[i].id))?.value
-      
+
     }
     this.activeChosenProducts = this.data.filter((x: { productQuantity: number; }) => x.productQuantity > 0);
     this.form.value.SoldProducts = this.data;
-    
-    this.saleService.prepareSale(this.activeChosenProducts)
-    .subscribe((response) => {
-      if(response.success){
-        this.total = response.data.result.totalSalePrice;
-      }
-    })
 
+    this.saleService.prepareSale(this.activeChosenProducts)
+      .subscribe((response) => {
+        if (response.success) {
+          this.total = response.data.result.totalSalePrice;
+          this.open(content);
+        } else {
+          response.errors.forEach((element: any) => {
+            this.toastr.error(element);
+          });
+        }
+      });
+  }
+  open(content: any) {
 
     this.modalService.open(content, {
       ariaLabelledBy: 'modal-basic-title',
@@ -180,7 +190,7 @@ export class PanelComponent {
     );
   }
 
-  openStopEvent(content: any) {    
+  openStopEvent(content: any) {
     this.getEventResult();
     this.modalService.open(content, {
       ariaLabelledBy: 'modal-basic-title',
@@ -195,11 +205,11 @@ export class PanelComponent {
     );
   }
 
-  startEvent(){
+  startEvent() {
     this.loadingService.setLoading(true);
     this.formEvent.value.responsible = this.accountName;
-    this.eventService.startEvent(this.formEvent.value).subscribe(_response =>{
-      if(_response){
+    this.eventService.startEvent(this.formEvent.value).subscribe(_response => {
+      if (_response) {
         this.formEvent.patchValue(_response);
         this.toastr.success('Evento iniciado');
         this.loadingService.setLoading(false);
@@ -207,7 +217,7 @@ export class PanelComponent {
         this.ngOnInit();
         this.ngAfterViewInit();
       }
-      else{
+      else {
         this.toastr.error('Erro ao iniciar o evento');
         this.loadingService.setLoading(false);
         this.ngOnInit();
@@ -215,28 +225,28 @@ export class PanelComponent {
       }
     });
   }
-  stopEvent(){
+  stopEvent() {
     this.eventService.stopEvent(this.formEvent.value).
-    subscribe(response => {
-      this.loadingService.setLoading(true);
-      this.formEvent.patchValue(response);
-      this.modalService.dismissAll();
-      this.loadingService.setLoading(false);
-      
-    });
+      subscribe(response => {
+        this.loadingService.setLoading(true);
+        this.formEvent.patchValue(response);
+        this.modalService.dismissAll();
+        this.loadingService.setLoading(false);
+
+      });
   }
-  getEvent(){
-    this.eventService.getEvent(this.accountName).subscribe(_response =>{
-      if(_response){
+  getEvent() {
+    this.eventService.getEvent(this.accountName).subscribe(_response => {
+      if (_response) {
         this.formEvent.patchValue(_response.data.result);
       }
     });
   }
-  getEventResult(){
+  getEventResult() {
     this.eventService.getEventResult(this.formEvent.value.id).
-    subscribe(_response => {
-      this.eventResult = _response.data;
-    });
+      subscribe(_response => {
+        this.eventResult = _response.data;
+      });
   }
   getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {
