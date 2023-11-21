@@ -5,6 +5,7 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { PanelComponent } from './panel/panel.component';
 import { DetailsComponent } from './details/details.component';
 import { ThemeModule } from 'src/app/@core/shared/theme/theme.module';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 
 @NgModule({
@@ -15,7 +16,7 @@ import { ThemeModule } from 'src/app/@core/shared/theme/theme.module';
   imports: [
     CommonModule,
     DashboardRoutingModule,
-    ThemeModule
+    ThemeModule,
   ]
 })
 export class DashboardModule { }

@@ -12,7 +12,7 @@ export class SecurityRequestService {
 
   constructor(
     private httpClient: HttpClient,
-    private authService:AuthService 
+    private authService: AuthService
   ) { }
 
   get(url: string, options?: any): Observable<any> {
@@ -62,12 +62,12 @@ export class SecurityRequestService {
     return of({})
       .pipe(
         switchMap(request => this.authService.getAccessTokenSilently()),
-        map(request => {        
+        map(request => {
           return Object.assign({}, options, {
             headers: new HttpHeaders().set('Authorization', `Bearer ${request}`)
           });
         }),
         switchMap(options1 => this.httpClient.request(method, url, options1))
-      );      
+      );
   }
 }

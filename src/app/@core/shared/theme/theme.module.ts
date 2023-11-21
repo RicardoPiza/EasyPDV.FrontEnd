@@ -6,6 +6,7 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { RouterModule } from '@angular/router';
 import { FixedPluginModule } from './fixedplugin/fixedplugin.module';
 import { SpinnerComponent } from './spinner/spinner.component';
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 
 
 
@@ -14,12 +15,13 @@ import { SpinnerComponent } from './spinner/spinner.component';
     FooterComponent,
     NavbarComponent,
     SidebarComponent,
-    SpinnerComponent,
+    SpinnerComponent
   ],
   imports: [
     CommonModule,
     RouterModule,
-    FixedPluginModule
+    FixedPluginModule,
+    MatProgressSpinnerModule
   ],
   exports: [
     FooterComponent,

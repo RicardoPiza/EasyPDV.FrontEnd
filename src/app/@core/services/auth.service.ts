@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { environment } from 'src/environments/environment';
 import * as auth0 from 'auth0-js';
 
 
@@ -13,11 +14,11 @@ export class AuthService {
 
   constructor() {
     this.auth0Client = new auth0.WebAuth({
-      clientID: 'LZiOO0SDH1vtHcGdArrRh7ExvzGrXa9a',
-      domain: 'dev-45cr7h6fi351b8w1.us.auth0.com',
-      responseType: 'token id_token',
-      redirectUri: 'http://localhost:4200/callback',
-      audience: 'https://localhost:44347'
+      clientID: environment.clientID,
+      domain: environment.domain,
+      responseType: environment.responseType,
+      redirectUri: environment.redirectUri,
+      audience: environment.audience
     });
   }
 

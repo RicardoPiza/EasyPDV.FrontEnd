@@ -44,7 +44,9 @@ export class PanelComponent {
     public authService: AuthService
   ) {
     config.backdrop = 'static';
-
+    this.authService.user$.subscribe(user => {
+      this.accountName = user?.name;
+    });
   }
 
   ngAfterViewInit(): void {
@@ -125,6 +127,7 @@ export class PanelComponent {
       description: "",
       desc: true,
       orderByColumn: '',
+      ownerUserEmail: this.accountName,
       termo: {
         dataField: '',
         value: '',

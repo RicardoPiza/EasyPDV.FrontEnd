@@ -5,6 +5,7 @@ import { ToastrService } from 'ngx-toastr';
 import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { LoaderService } from 'src/app/@core/shared/services/loader.service';
 import { ModalDismissReasons, NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
+import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
   selector: 'app-panel',
@@ -20,6 +21,7 @@ export class PanelComponent implements OnInit, AfterViewInit {
   public showSuccessToast: boolean = false;
   @Output()
   public data: Array<any> = [];
+  public accountName: any;
   public dataSource: MatTableDataSource<any> = new MatTableDataSource;
   public productImage = new FormData();
   constructor(
@@ -29,10 +31,16 @@ export class PanelComponent implements OnInit, AfterViewInit {
     private modalService: NgbModal,
     private loadingService: LoaderService,
     private config: NgbModalConfig,
+    private authService: AuthService
   ) {
     config.backdrop = 'static';
+    this.authService.user$.subscribe(user => {
+      this.accountName = user?.name;
+    });
   }
   ngAfterViewInit(): void {
+    
+
     this.data.splice(0);
     let params = this.getParametros();
     this.loadingService.setLoading(true);
@@ -59,12 +67,15 @@ export class PanelComponent implements OnInit, AfterViewInit {
       stockQuantity: [],
       status: [''],
       description: ['', Validators.required],
+      ownerUserEmail: ['']
     });
+    this.form.controls['status'].setValue("Ativo", { onlySelf: true });
   }
 
   submit(content: any): void {
     this.loadingService.setLoading(true);
     if (this.form.value.id == '00000000-0000-0000-0000-000000000000') {
+      this.form.value.ownerUserEmail = this.accountName;
       this.productService.postProduct(this.form.value)
         .subscribe(response => {
           if (response.success) {
@@ -72,12 +83,14 @@ export class PanelComponent implements OnInit, AfterViewInit {
             this.toastr.success('Produto adicionado com sucesso, Agora, selecione uma imagem');
             this.loadingService.setLoading(false);
             this.modalService.dismissAll();
-            this.getProduct(response.data.result.id, content);
-          } else{
-            this.toastr.success('erro ao adicionar produto');
+            this.getProduct(response.data.id, content);
+          } else {
+            response.errors.forEach((element: any) => {
+              this.toastr.error(element);
+            });
             this.loadingService.setLoading(false);
             this.modalService.dismissAll();
-          } 
+          }
         });
     } else {
       this.productService.updateProduct(this.form.value)
@@ -104,6 +117,7 @@ export class PanelComponent implements OnInit, AfterViewInit {
       description: "",
       desc: true,
       orderByColumn: '',
+      ownerUserEmail: this.accountName,
       termo: {
         dataField: '',
         value: '',
