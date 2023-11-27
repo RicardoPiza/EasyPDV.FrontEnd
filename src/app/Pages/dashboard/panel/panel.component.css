@@ -1,0 +1,25 @@
+.title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 2em;
+    padding-bottom: 50px;
+}
+
+.chart {
+    position: relative !important;
+    z-index: 1000;
+}
+
+table {
+    width: 100%;
+}
+
+.excelButton {
+    position: relative !important;
+    z-index: 1000;
+}
+
+.example-button-row {
+    display: table-cell;
+    max-width: 600px;
+}

@@ -80,9 +80,10 @@ export class PanelComponent {
           this.loadingService.setLoading(false);
         }
         this.getEvent();
-      }); this.authService.user$.subscribe(user => {
-        this.accountName = user?.name;
       });
+    this.authService.user$.subscribe(user => {
+      this.accountName = user?.name;
+    });
 
   }
 
@@ -156,8 +157,15 @@ export class PanelComponent {
     this.ngAfterViewInit();
     this.formProduct.value.productQuantity = 0;
   }
+  sumItem(id: any){
+    let element = (<HTMLInputElement>document.getElementById(id));
+    if(element.value == ""){
+      element.value = '0'
+    }
+    element.value = (parseInt(element.value) + 1).toString();
+  }
 
-  sell(content: any){
+  sell(content: any) {
 
     for (var i = 0; i < this.activeProducts.length; i++) {
       this.data[i].productQuantity = (<HTMLInputElement>document.getElementById(this.activeProducts[i].id))?.value

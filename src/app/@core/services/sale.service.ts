@@ -13,7 +13,12 @@ export class SaleService {
   prepareSale(parameters: any): Observable<any> {
     return this.securityRequestService.post(`${environment.webAppApi}/Sale/PrepareSale`, parameters);
   }
+  
   postSale(parameters: any): Observable<any> {
     return this.securityRequestService.post(`${environment.webAppApi}/Sale/MakeSale`, parameters);
+  }
+
+  getReport(parameters: any): Observable<any> {
+    return this.securityRequestService.post(`${environment.webAppApi}/Sale/GetReport`, parameters);
   }
 }

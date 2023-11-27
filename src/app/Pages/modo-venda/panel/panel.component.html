@@ -146,7 +146,7 @@
                 <div class="row row-cols-2 row-cols-md-5 align-self-center">
                     <div class="col mt-2" *ngFor="let product of data;let i = index ">
                         <form [formGroup]="formProduct">
-                            <div class="card card-product">
+                            <div class="card card-product" (click)="sumItem(product.id)">
                                 <div class="row text-center">
                                     <div class="col">
                                         <img class="card-img-top" [src]="'data:image/*;base64,' + product.image"
