@@ -56,10 +56,10 @@ export class PanelComponent {
 
     this.data.splice(0);
     let params = this.getParametros();
-    this.loadingService.setLoading(true);
     this.productService
       .listProducts(params)
       .subscribe((response) => {
+        this.loadingService.setLoading(true);
         if (response.success) {
           this.activeProducts = response.data.result.products.filter((x: { status: string; }) => x.status == 'Ativo');
           for (var i = 0; i < this.activeProducts.length; i++) {
@@ -78,6 +78,9 @@ export class PanelComponent {
 
           this.dataSource = new MatTableDataSource<any>(this.data);
           this.loadingService.setLoading(false);
+        } else {
+          this.loadingService.setLoading(false);
+
         }
         this.getEvent();
       });
@@ -157,9 +160,9 @@ export class PanelComponent {
     this.ngAfterViewInit();
     this.formProduct.value.productQuantity = 0;
   }
-  sumItem(id: any){
+  sumItem(id: any) {
     let element = (<HTMLInputElement>document.getElementById(id));
-    if(element.value == ""){
+    if (element.value == "") {
       element.value = '0'
     }
     element.value = (parseInt(element.value) + 1).toString();

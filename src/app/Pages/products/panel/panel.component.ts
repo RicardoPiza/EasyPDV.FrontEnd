@@ -39,25 +39,27 @@ export class PanelComponent implements OnInit, AfterViewInit {
     });
   }
   ngAfterViewInit(): void {
-    
-
+    this.getData();
+  }
+  getData(){
     this.data.splice(0);
     let params = this.getParametros();
-    this.loadingService.setLoading(true);
     this.productService
       .listProducts(params)
       .subscribe((response) => {
+        this.loadingService.setLoading(true);
         if (response.success)
           for (var i = 0; i < response.data.result.products.length; i++) {
             this.data.push(response.data.result.products[i]);
             response.data.result.products[i].image = 'data:image/*;base64,' + response.data.result.products[i].image;
+          } else{
+            this.loadingService.setLoading(false);
           }
 
         this.dataSource = new MatTableDataSource<any>(this.data);
         this.loadingService.setLoading(false);
       });
   }
-
   ngOnInit() {
     this.form = this.formBuilder.group({
       id: ['00000000-0000-0000-0000-000000000000'],

@@ -26,4 +26,7 @@ export class EventService {
   getEventResult(parameters: any): Observable<any> {
     return this.securityRequestService.get(`${environment.webAppApi}/Event/GetEventResult/${parameters}`);
   }
+  getEventReport(parameters: any): Observable<any> {
+    return this.securityRequestService.post(`${environment.webAppApi}/Event/GetEventReport`, parameters);
+  }
 }
