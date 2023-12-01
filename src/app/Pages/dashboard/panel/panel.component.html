@@ -2,15 +2,17 @@
 <div class="wrapper">
   <div class="main-panel">
     <app-navbar></app-navbar>
-    <div class="content" *ngIf="this.pageVisibility">
+    <div class="content" *ngIf="this.hasData">
       <h5 class="title">Vendas por produtos</h5>
       <div class="row">
-        <div class="col-sm-4">
+        <div class="col align-self-center">
           <div class="chart">
             <canvas id="productsChart"></canvas>
           </div>
         </div>
-        <div class="col-sm " style="padding-left: 400px;">
+      </div>
+      <div class="row">
+        <div class="col" >
           <div class="mat-elevation-z8" #TABLE>
             <table mat-table [dataSource]="dataSource">
               <ng-container matColumnDef="productName">
@@ -50,16 +52,16 @@
       </div>
       <h5 class="title">Histórico de Eventos</h5>
       <div class="row">
-        <div class="col-sm-4">
-          <div class="eventChart">
+        <div class="col align-self-center">
+          <div class="chart">
             <canvas id="eventsChart"></canvas>
           </div>
         </div>
       </div>
       <div class="row">
-        <div class="col-sm ">
+        <div class="col">
           <div class="mat-elevation-z8" #EVENTTABLE>
-            <table mat-table #table [dataSource]="eventDataSource">
+            <table mat-table [dataSource]="eventDataSource">
               <ng-container matColumnDef="name">
                 <th mat-header-cell *matHeaderCellDef> Evento </th>
                 <td mat-cell *matCellDef="let element"> {{element.name}} </td>
@@ -94,14 +96,14 @@
           </div>
           <div class="row" style="padding-top: 15px;">
             <div class="col align-self-end">
-              <button class="excelButton" mat-raised-button (click)="exportEventAsExcel()"><img src="../assets/img/excel.png"
-                  alt="" height="30px" width="30px"></button>
+              <button class="excelButton" mat-raised-button (click)="exportEventAsExcel()"><img
+                  src="../assets/img/excel.png" alt="" height="30px" width="30px"></button>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <div class="content" *ngIf="!this.pageVisibility">
+    <div class="content" *ngIf="!this.hasData">
       <h1 class="title" style="margin: auto; padding: auto;"><i> Nenhuma venda registrada...</i></h1>
     </div>
   </div>

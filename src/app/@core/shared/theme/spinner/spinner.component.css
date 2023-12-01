@@ -5,7 +5,7 @@
   right: 0;
   top: 0;
   bottom: 0;
-  background-color: transparent;
+  background-color: rgba(255, 255, 255, 0.5); /* Adicione a opacidade desejada ao fundo branco usando RGBA */
   z-index: 9999;
 }
 
@@ -18,11 +18,13 @@
   width: 100px;
   height: 100px;
   margin: 0 auto;
-  border: 10px solid rgb(0, 0, 0);
-  border-radius: 70%;
+  border: 12px solid rgb(0, 0, 0);
+  border-radius: 80%;
   border-left-color: transparent;
   border-right-color: transparent;
-  animation: cssload-spin 1000ms infinite linear;
+  animation: cssload-spin 1300ms infinite linear;
+  background-color: white; /* Adicione a cor de fundo do spinner */
+  opacity: 1; /* Garante que o spinner seja completamente opaco */
 }
 
 @keyframes cssload-spin {
