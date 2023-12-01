@@ -59,7 +59,6 @@ export class PanelComponent {
     this.productService
       .listProducts(params)
       .subscribe((response) => {
-        this.loadingService.setLoading(true);
         if (response.success) {
           this.activeProducts = response.data.result.products.filter((x: { status: string; }) => x.status == 'Ativo');
           for (var i = 0; i < this.activeProducts.length; i++) {
@@ -145,15 +144,18 @@ export class PanelComponent {
     this.formEvent.value.responsible = this.accountName;
     this.formEvent.value.sales.push(this.form.value);
     this.form.value.SoldProducts = this.activeChosenProducts;
+    this.loadingService.setLoading(true);
     this.saleService.postSale(this.formEvent.value)
       .subscribe((result) => {
         if (result.success) {
           this.toastr.success('Venda realizada com sucesso');
           this.modalService.dismissAll();
+          this.loadingService.setLoading(false);
         } else {
           result.errors.forEach((element: any) => {
             this.toastr.error(element);
           });
+          this.loadingService.setLoading(false);
         }
       });
     this.ngOnInit();
@@ -169,7 +171,6 @@ export class PanelComponent {
   }
 
   sell(content: any) {
-
     for (var i = 0; i < this.activeProducts.length; i++) {
       this.data[i].productQuantity = (<HTMLInputElement>document.getElementById(this.activeProducts[i].id))?.value
 
@@ -180,14 +181,17 @@ export class PanelComponent {
     this.saleService.prepareSale(this.activeChosenProducts)
       .subscribe((response) => {
         if (response.success) {
-          this.total = response.data.result.totalSalePrice;
+          this.total = response.data.totalSalePrice;
           this.open(content);
+          this.loadingService.setLoading(false);
         } else {
           response.errors.forEach((element: any) => {
             this.toastr.error(element);
           });
+          this.loadingService.setLoading(false);
         }
       });
+    this.loadingService.setLoading(false);
   }
   open(content: any) {
 
@@ -220,47 +224,52 @@ export class PanelComponent {
   }
 
   startEvent() {
-    this.loadingService.setLoading(true);
     this.formEvent.value.responsible = this.accountName;
     this.eventService.startEvent(this.formEvent.value).subscribe(_response => {
       if (_response) {
         this.formEvent.patchValue(_response);
         this.toastr.success('Evento iniciado');
-        this.loadingService.setLoading(false);
         this.modalService.dismissAll();
         this.ngOnInit();
         this.ngAfterViewInit();
+        this.loadingService.setLoading(false);
       }
       else {
         this.toastr.error('Erro ao iniciar o evento');
-        this.loadingService.setLoading(false);
         this.ngOnInit();
         this.ngAfterViewInit();
+        this.loadingService.setLoading(false);
       }
     });
   }
   stopEvent() {
     this.eventService.stopEvent(this.formEvent.value).
       subscribe(response => {
-        this.loadingService.setLoading(true);
         this.formEvent.patchValue(response);
         this.modalService.dismissAll();
         this.loadingService.setLoading(false);
 
       });
+    this.loadingService.setLoading(false);
   }
   getEvent() {
     this.eventService.getEvent(this.accountName).subscribe(_response => {
-      if (_response) {
-        this.formEvent.patchValue(_response.data.result);
+      if (_response.success) {
+        this.formEvent.patchValue(_response.data);
+        this.loadingService.setLoading(false);
+      } else {
+        this.toastr.error('Evento não encontrado');
+        this.loadingService.setLoading(false);
       }
     });
+    this.loadingService.setLoading(false);
   }
   getEventResult() {
     this.eventService.getEventResult(this.formEvent.value.id).
       subscribe(_response => {
         this.eventResult = _response.data;
       });
+    this.loadingService.setLoading(false);
   }
   getDismissReason(reason: any): string {
     if (reason === ModalDismissReasons.ESC) {

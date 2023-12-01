@@ -6,7 +6,12 @@
   <div class="main-panel">
     <app-navbar></app-navbar>
     <div class="content">
-      <h1 class="title text-center ">Cadastro de produtos</h1>
+      <div class="row">
+        <div class="col">
+          <h1 class="title text-center">Cadastro de produtos</h1>
+        </div>
+      </div>
+
       <ng-template #content let-modal>
         <div class="modal-header">
           <h4 class="modal-title" id="modal-basic-title">Adicionar produto</h4>
@@ -54,65 +59,66 @@
         </div>
       </ng-template>
 
-      <div >
+      <div>
         <button mat-fab (click)="open(content)" title="Adicionar" class="example-button-container">
           <mat-icon class="button-add">add</mat-icon>
         </button>
       </div>
       <div class="container">
-      <div class="row row-cols-2 row-cols-md-5">
-        <div class="col mt-2" *ngFor="let product of data ">
-          <div class="card card-product">
-            <div class="row text-center">
-              <div class="col">
-                <img class="card-img-top" [src]="product.image" alt="image">
-              </div>
-            </div>
-            <div class="card-body">
-              <h5 class="card-title text-center">{{product.name}}</h5>
-              <p class="card-text text-center">{{product.description +" - R$"+ product.price}}</p>
-              <p class="card-text text-center statusActive" *ngIf="product.status == 'Ativo'">{{product.status}}</p>
-              <p class="card-text text-center statusInactive" *ngIf="product.status == 'Inativo'">{{product.status}}</p>
+        <div class="row row-cols-2 row-cols-md-5">
+          <div class="col mt-2" *ngFor="let product of data ">
+            <div class="card card-product">
               <div class="row text-center">
                 <div class="col">
-                  <a (click)="openConfirmation(confirmContent)" title="Remover">
-                    <i class="material-icons remove-button">
-                      delete
-                    </i>
-                  </a>
-                  <a title="Editar" (click)="getProduct(product.id, content)">
-                    <i class="material-icons edit-button">
-                      edit_square
-                    </i>
-                  </a>
+                  <img class="card-img-top" [src]="product.image" alt="image">
+                </div>
+              </div>
+              <div class="card-body">
+                <h5 class="card-title text-center">{{product.name}}</h5>
+                <p class="card-text text-center">{{product.description +" - R$"+ product.price}}</p>
+                <p class="card-text text-center statusActive" *ngIf="product.status == 'Ativo'">{{product.status}}</p>
+                <p class="card-text text-center statusInactive" *ngIf="product.status == 'Inativo'">{{product.status}}
+                </p>
+                <div class="row text-center">
+                  <div class="col">
+                    <a (click)="openConfirmation(confirmContent)" title="Remover">
+                      <i class="material-icons remove-button">
+                        delete
+                      </i>
+                    </a>
+                    <a title="Editar" (click)="getProduct(product.id, content)">
+                      <i class="material-icons edit-button">
+                        edit_square
+                      </i>
+                    </a>
+                  </div>
                 </div>
               </div>
             </div>
+            <ng-template #confirmContent let-modal>
+              <div class="modal-header">
+                <h4 class="modal-title" id="modal-title">Exclusão de produto</h4>
+                <button type="button" class="btn-close" aria-describedby="modal-title"
+                  (click)="modal.dismiss('Cross click')"></button>
+              </div>
+              <div class="modal-body">
+                <p>
+                  <strong>Tem certeza que deseja excluir o produto <span
+                      class="text-primary">"{{product.name}}"</span></strong>
+                </p>
+                <p>
+                  Todas as informações associadas a esse produto serão excluídas.
+                  <span class="text-danger">Essa operação não pode ser desfeita</span>
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary"
+                  (click)="modal.dismiss('cancel click')">Cancelar</button>
+                <button type="button" class="btn btn-danger" (click)="remove(product.id)">Ok</button>
+              </div>
+            </ng-template>
           </div>
-          <ng-template #confirmContent let-modal>
-            <div class="modal-header">
-              <h4 class="modal-title" id="modal-title">Exclusão de produto</h4>
-              <button type="button" class="btn-close" aria-describedby="modal-title"
-                (click)="modal.dismiss('Cross click')"></button>
-            </div>
-            <div class="modal-body">
-              <p>
-                <strong>Tem certeza que deseja excluir o produto <span
-                    class="text-primary">"{{product.name}}"</span></strong>
-              </p>
-              <p>
-                Todas as informações associadas a esse produto serão excluídas.
-                <span class="text-danger">Essa operação não pode ser desfeita</span>
-              </p>
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-outline-secondary"
-                (click)="modal.dismiss('cancel click')">Cancelar</button>
-              <button type="button" class="btn btn-danger" (click)="remove(product.id)">Ok</button>
-            </div>
-          </ng-template>
         </div>
-      </div>
       </div>
     </div>
   </div>

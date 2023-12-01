@@ -31,7 +31,8 @@ export class PanelComponent implements OnInit, AfterViewInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('TABLE') table!: ElementRef;
   @ViewChild('EVENTTABLE') eventTable!: ElementRef;
-  public pageVisibility: boolean = true;
+  public hasData: boolean = true;
+  public isPageLoaded: boolean = true;
 
   constructor(
     private saleService: SaleService,
@@ -43,6 +44,7 @@ export class PanelComponent implements OnInit, AfterViewInit {
     this.authService.user$.subscribe(user => {
       this.accountName = user?.name;
     });
+    this.isPageLoaded = this.loadingService.getLoading();
   }
   ngAfterViewInit(): void {
     this.getEvent();
@@ -66,38 +68,38 @@ export class PanelComponent implements OnInit, AfterViewInit {
 
   getEvent() {
     this.eventService.getEvent(this.accountName).subscribe(_response => {
-      this.loadingService.setLoading(true);
       if (_response.success) {
-        this.formEvent.patchValue(_response.data.result);
-        this.saleService.getReport(_response.data.result).subscribe(response => {
+        this.formEvent.patchValue(_response.data);
+        this.saleService.getReport(_response.data.responsible, _response.data.id).subscribe(response => {
 
           if (response.success) {
 
             if (response.data.length <= 0) {
-              this.pageVisibility = false;
+              this.hasData = false;
               this.loadingService.setLoading(false);
             } else {
               this.dataSource = new MatTableDataSource<SalesPeriodicElement>(response.data);
               this.dataSource.paginator = this.paginator;
               this.chartData = response.data;
               this.displayedColumns = ['productName', 'price', 'quantitySold', 'saleTotal']
-              this.buildChart();
               this.loadingService.setLoading(false);
+              this.buildChart();
             }
 
           } else {
             this.loadingService.setLoading(false);
           }
         });
-        this.eventService.getEventReport(_response.data.result).subscribe((_response) => {
-          this.eventDisplayedColumns = ['name', 'totalProfit', 'initialBalance', 'duration', 'created']
-          this.eventDataSource = new MatTableDataSource<EventPeriodicElement>(_response.data);
-          _response.data.forEach((element: any) => {
-            element.created = formatDate(element.created, 'dd/MM/yyyy', 'en-US');
-          });          
-          this.eventChartData = _response.data;
-          this.buildEventChart();
-          console.log(_response)
+        this.eventService.getEventReport(_response.data.responsible).subscribe((_response) => {
+          if (_response.success) {
+            this.eventDisplayedColumns = ['name', 'totalProfit', 'initialBalance', 'duration', 'created']
+            this.eventDataSource = new MatTableDataSource<EventPeriodicElement>(_response.data);
+            _response.data.forEach((element: any) => {
+              element.created = formatDate(element.created, 'dd/MM/yyyy', 'en-US');
+            });
+            this.eventChartData = _response.data;
+            this.buildEventChart();
+          }
         });
       } else {
         this.loadingService.setLoading(false);

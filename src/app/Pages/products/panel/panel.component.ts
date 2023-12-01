@@ -42,12 +42,12 @@ export class PanelComponent implements OnInit, AfterViewInit {
     this.getData();
   }
   getData(){
+    this.loadingService.setLoading(true);
     this.data.splice(0);
     let params = this.getParametros();
     this.productService
       .listProducts(params)
       .subscribe((response) => {
-        this.loadingService.setLoading(true);
         if (response.success)
           for (var i = 0; i < response.data.result.products.length; i++) {
             this.data.push(response.data.result.products[i]);

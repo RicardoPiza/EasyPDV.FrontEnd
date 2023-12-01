@@ -18,7 +18,7 @@ export class SaleService {
     return this.securityRequestService.post(`${environment.webAppApi}/Sale/MakeSale`, parameters);
   }
 
-  getReport(parameters: any): Observable<any> {
-    return this.securityRequestService.post(`${environment.webAppApi}/Sale/GetReport`, parameters);
+  getReport(responsible: any, id: any): Observable<any> {
+    return this.securityRequestService.get(`${environment.webAppApi}/Sale/GetReport/${responsible}/${id}`);
   }
 }
