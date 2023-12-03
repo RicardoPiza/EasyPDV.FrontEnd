@@ -29,4 +29,7 @@ export class EventService {
   getEventReport(responsible: any): Observable<any> {
     return this.securityRequestService.get(`${environment.webAppApi}/Event/GetEventReport/${responsible}`);
   }
+  sendDuration(parameters: any){
+    return this.securityRequestService.post(`${environment.webAppApi}/Event/SendDuration`, parameters);
+  }
 }
