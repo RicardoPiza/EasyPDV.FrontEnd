@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, Output, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { ProductService } from 'src/app/@core/services/product.service';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ToastrService } from 'ngx-toastr';
@@ -6,6 +6,7 @@ import { UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms
 import { LoaderService } from 'src/app/@core/shared/services/loader.service';
 import { ModalDismissReasons, NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { AuthService } from '@auth0/auth0-angular';
+import { EventService } from 'src/app/@core/services/event.service';
 
 @Component({
   selector: 'app-panel',
@@ -13,7 +14,7 @@ import { AuthService } from '@auth0/auth0-angular';
   styleUrls: ['./panel.component.css']
 })
 
-export class PanelComponent implements OnInit, AfterViewInit {
+export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public page = 1;
   public closeResult = '';
@@ -24,6 +25,10 @@ export class PanelComponent implements OnInit, AfterViewInit {
   public accountName: any;
   public dataSource: MatTableDataSource<any> = new MatTableDataSource;
   public productImage = new FormData();
+  public formEvent!: UntypedFormGroup;
+  public hours: number = 0;
+  public minutes: number = 0;
+  public seconds: number = 0;
   constructor(
     private productService: ProductService,
     private toastr: ToastrService,
@@ -31,6 +36,7 @@ export class PanelComponent implements OnInit, AfterViewInit {
     private modalService: NgbModal,
     private loadingService: LoaderService,
     private config: NgbModalConfig,
+    private eventService: EventService,
     private authService: AuthService
   ) {
     config.backdrop = 'static';
@@ -38,8 +44,12 @@ export class PanelComponent implements OnInit, AfterViewInit {
       this.accountName = user?.name;
     });
   }
+  ngOnDestroy(): void {
+    this.sendDuration();
+  }
   ngAfterViewInit(): void {
     this.getData();
+    this.getEvent();
   }
   getData(){
     this.loadingService.setLoading(true);
@@ -72,6 +82,34 @@ export class PanelComponent implements OnInit, AfterViewInit {
       ownerUserEmail: ['']
     });
     this.form.controls['status'].setValue("Ativo", { onlySelf: true });
+
+    this.formEvent = this.formBuilder.group({
+      id: ['00000000-0000-0000-0000-000000000000'],
+      name: [''],
+      cashierStatus: [],
+      balance: [0],
+      sales: [[]],
+      date: [Date],
+      duration: [''],
+      responsible: ['']
+    });
+  }
+
+  getEvent() {
+    this.eventService.getEvent(this.accountName).subscribe(_response => {
+      if (_response.success) {
+        let _duration: Array<any> = _response.data.duration.split(":", 3);
+        this.hours = parseInt(_duration[0]);
+        this.minutes = parseInt(_duration[1]);
+        this.seconds = parseInt(_duration[2]);
+        this.formEvent.patchValue(_response.data);
+        this.loadingService.setLoading(false);
+      } else {
+        this.toastr.error('Evento não encontrado');
+        this.loadingService.setLoading(false);
+      }
+    });
+    this.loadingService.setLoading(false);
   }
 
   submit(content: any): void {
@@ -229,5 +267,15 @@ export class PanelComponent implements OnInit, AfterViewInit {
         }
       });
     this.modalService.dismissAll();
+  }
+  updateDuration(noNovoTempo: string): void {
+    this.formEvent.value.duration = noNovoTempo;
+  }
+  sendDuration(){
+    this.eventService.sendDuration(this.formEvent.value).subscribe(response =>{
+      if(response.success){
+        this.formEvent.value.duration = response.data
+      }
+    }); 
   }
 }

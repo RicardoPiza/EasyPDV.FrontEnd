@@ -1,5 +1,5 @@
 import { formatDate } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
@@ -16,7 +16,7 @@ import * as XLSX from 'xlsx';
   styleUrls: ['./panel.component.css']
 })
 
-export class PanelComponent implements OnInit, AfterViewInit {
+export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public chartColor: any;
   public chartEmail: any;
   public chartHours: any;
@@ -33,6 +33,9 @@ export class PanelComponent implements OnInit, AfterViewInit {
   @ViewChild('EVENTTABLE') eventTable!: ElementRef;
   public hasData: boolean = true;
   public isPageLoaded: boolean = true;
+  public hours: number = 0;
+  public minutes: number = 0;
+  public seconds: number = 0;
 
   constructor(
     private saleService: SaleService,
@@ -45,6 +48,9 @@ export class PanelComponent implements OnInit, AfterViewInit {
       this.accountName = user?.name;
     });
     this.isPageLoaded = this.loadingService.getLoading();
+  }
+  ngOnDestroy(): void {
+    this.sendDuration();
   }
   ngAfterViewInit(): void {
     this.getEvent();
@@ -60,7 +66,7 @@ export class PanelComponent implements OnInit, AfterViewInit {
       balance: [0],
       sales: [[]],
       date: [Date],
-      duration: [0],
+      duration: [''],
       responsible: ['']
     });
 
@@ -69,6 +75,10 @@ export class PanelComponent implements OnInit, AfterViewInit {
   getEvent() {
     this.eventService.getEvent(this.accountName).subscribe(_response => {
       if (_response.success) {
+        let _duration: Array<any> = _response.data.duration.split(":", 3);
+        this.hours = parseInt(_duration[0]);
+        this.minutes = parseInt(_duration[1]);
+        this.seconds = parseInt(_duration[2]);
         this.formEvent.patchValue(_response.data);
         this.saleService.getReport(_response.data.responsible, _response.data.id).subscribe(response => {
 
@@ -171,6 +181,16 @@ export class PanelComponent implements OnInit, AfterViewInit {
     /* save to file */
     XLSX.writeFile(wb, `${this.formEvent.value.name} ${this.formEvent.value.date}.xlsx`);
 
+  }
+  updateDuration(noNovoTempo: string): void {
+    this.formEvent.value.duration = noNovoTempo;
+  }
+  sendDuration(){
+    this.eventService.sendDuration(this.formEvent.value).subscribe(response =>{
+      if(response.success){
+        this.formEvent.value.duration = response.data
+      }
+    }); 
   }
 }
 export interface SalesPeriodicElement {

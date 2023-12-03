@@ -1,4 +1,4 @@
-import { Component, Output } from '@angular/core';
+import { Component, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormArray, UntypedFormBuilder, UntypedFormGroup, Validators } from '@angular/forms';
 import { MatTableDataSource } from '@angular/material/table';
 import { NgbModal, NgbModalConfig, ModalDismissReasons } from '@ng-bootstrap/ng-bootstrap';
@@ -14,7 +14,7 @@ import { AuthService } from '@auth0/auth0-angular';
   templateUrl: './panel.component.html',
   styleUrls: ['./panel.component.css']
 })
-export class PanelComponent {
+export class PanelComponent implements OnInit, OnDestroy{
 
   public page = 1;
   public total = 0.0;
@@ -27,6 +27,10 @@ export class PanelComponent {
   public accountName: any;
   public showSuccessToast: boolean = false;
   public eventResult: any;
+  public hours: number = 0;
+  public minutes: number = 0;
+  public seconds: number = 0;
+
 
   @Output()
   public data: Array<any> = [];
@@ -47,6 +51,9 @@ export class PanelComponent {
     this.authService.user$.subscribe(user => {
       this.accountName = user?.name;
     });
+  }
+  ngOnDestroy(): void {
+    this.sendDuration();
   }
 
   ngAfterViewInit(): void {
@@ -116,10 +123,9 @@ export class PanelComponent {
       balance: [0],
       sales: [[]],
       date: [Date],
-      duration: [0],
+      duration: [''],
       responsible: ['']
     });
-
   }
   private getParametros(): any {
     let params = {
@@ -148,6 +154,10 @@ export class PanelComponent {
     this.saleService.postSale(this.formEvent.value)
       .subscribe((result) => {
         if (result.success) {
+          let _duration: Array<any> = result.data.duration.split(":", 3);
+          this.hours = parseInt(_duration[0]);
+          this.minutes = parseInt(_duration[1]);
+          this.seconds = parseInt(_duration[2]);
           this.toastr.success('Venda realizada com sucesso');
           this.modalService.dismissAll();
           this.loadingService.setLoading(false);
@@ -225,6 +235,7 @@ export class PanelComponent {
 
   startEvent() {
     this.formEvent.value.responsible = this.accountName;
+    this.formEvent.value.duration = '0';
     this.eventService.startEvent(this.formEvent.value).subscribe(_response => {
       if (_response) {
         this.formEvent.patchValue(_response);
@@ -255,6 +266,10 @@ export class PanelComponent {
   getEvent() {
     this.eventService.getEvent(this.accountName).subscribe(_response => {
       if (_response.success) {
+        let _duration: Array<any> = _response.data.duration.split(":", 3);
+        this.hours = parseInt(_duration[0]);
+        this.minutes = parseInt(_duration[1]);
+        this.seconds = parseInt(_duration[2]);
         this.formEvent.patchValue(_response.data);
         this.loadingService.setLoading(false);
       } else {
@@ -279,5 +294,15 @@ export class PanelComponent {
     } else {
       return `with: ${reason}`;
     }
+  }
+  updateDuration(noNovoTempo: string): void {
+    this.formEvent.value.duration = noNovoTempo;
+  }
+  sendDuration(){
+    this.eventService.sendDuration(this.formEvent.value).subscribe(response =>{
+      if(response.success){
+        this.formEvent.value.duration = response.data
+      }
+    }); 
   }
 }

@@ -9,7 +9,18 @@
             <div *ngIf="this.formEvent.value.cashierStatus == 0">
                 <div class="row">
                     <div class="col align-self-start">
-                        <h5>Evento ativo: <i style="color: rgb(57, 141, 102);font-weight: bold;">{{this.formEvent.value.name}}</i></h5>
+                        <h5>Evento ativo: <i
+                                style="color: rgb(57, 141, 102);font-weight: bold;">{{this.formEvent.value.name}}</i>
+                        </h5>
+                        <div style="position: relative; z-index: 1000;">
+                            <app-cronometro 
+                            [hours]="this.hours" 
+                            [minutes]="this.minutes" 
+                            [seconds]="this.seconds"
+                            (tempoAtualizado)="updateDuration($event)">
+                            </app-cronometro>
+                        </div>
+
                     </div>
                 </div>
                 <div class="row">
