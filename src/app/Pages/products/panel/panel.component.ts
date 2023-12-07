@@ -45,14 +45,14 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
   ngOnDestroy(): void {
-    this.sendDuration();
+    if (this.formEvent.value.cashierStatus == 0)
+      this.sendDuration();
   }
   ngAfterViewInit(): void {
     this.getData();
     this.getEvent();
   }
-  getData(){
-    this.loadingService.setLoading(true);
+  getData() {
     this.data.splice(0);
     let params = this.getParametros();
     this.productService
@@ -62,15 +62,20 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
           for (var i = 0; i < response.data.result.products.length; i++) {
             this.data.push(response.data.result.products[i]);
             response.data.result.products[i].image = 'data:image/*;base64,' + response.data.result.products[i].image;
-          } else{
-            this.loadingService.setLoading(false);
-          }
+          } else {
+          this.loadingService.setLoading(false);
+        }
 
         this.dataSource = new MatTableDataSource<any>(this.data);
         this.loadingService.setLoading(false);
       });
   }
   ngOnInit() {
+    this.buildProductForm();
+    this.buildEventForm();
+  }
+
+  buildProductForm(){
     this.form = this.formBuilder.group({
       id: ['00000000-0000-0000-0000-000000000000'],
       price: [],
@@ -82,7 +87,9 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
       ownerUserEmail: ['']
     });
     this.form.controls['status'].setValue("Ativo", { onlySelf: true });
-
+  
+  }
+  buildEventForm(){
     this.formEvent = this.formBuilder.group({
       id: ['00000000-0000-0000-0000-000000000000'],
       name: [''],
@@ -94,7 +101,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
       responsible: ['']
     });
   }
-
   getEvent() {
     this.eventService.getEvent(this.accountName).subscribe(_response => {
       if (_response.success) {
@@ -111,9 +117,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     });
     this.loadingService.setLoading(false);
   }
-
   submit(content: any): void {
-    this.loadingService.setLoading(true);
     if (this.form.value.id == '00000000-0000-0000-0000-000000000000') {
       this.form.value.ownerUserEmail = this.accountName;
       this.productService.postProduct(this.form.value)
@@ -137,7 +141,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
         .subscribe(response => {
           if (response.success) {
             this.form.patchValue(response.data.result);
-            this.ngAfterViewInit();
             this.toastr.success('Produto atualizado com sucesso');
             this.loadingService.setLoading(false);
           } else {
@@ -167,13 +170,10 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     return params;
   }
   remove(id: any) {
-    this.loadingService.setLoading(true);
     this.productService.removeProduct(id)
       .subscribe((response) => {
         if (response.success) {
           this.data.splice(response.data.result, 1);
-          this.ngOnInit();
-          this.ngAfterViewInit();
           this.toastr.warning('Produto excluído');
           this.loadingService.setLoading(false);
         } else {
@@ -186,8 +186,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
 
   open(content: any) {
-    this.ngOnInit();
-    this.ngAfterViewInit();
+    this.buildProductForm();
     this.modalService.open(content, {
       ariaLabelledBy: 'modal-basic-title',
       size: 'xl',
@@ -201,7 +200,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
   openImageSelect(content: any) {
-    this.ngOnInit();
     this.modalService.open(content, {
       ariaLabelledBy: 'modal-basic-title',
       size: 'm',
@@ -215,7 +213,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     );
   }
   openConfirmation(content: any) {
-    this.ngOnInit();
     this.modalService.open(content, {
       ariaLabelledBy: 'modal-basic-title',
       size: 'm',
@@ -231,7 +228,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   getProduct(id: any, content: any) {
     this.productService.getById(id)
       .subscribe((response) => {
-        this.loadingService.setLoading(true);
         if (response) {
           this.loadingService.setLoading(false);
           this.form.patchValue(response.data);
@@ -253,7 +249,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   }
   handleFileInput(event: any) {
     this.productImage = new FormData();
-    this.loadingService.setLoading(true);
     this.productImage.append('Image', event.target.files[0]);
     this.productService.saveImage(this.productImage, this.form.value.id)
       .subscribe(response => {
@@ -271,11 +266,11 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   updateDuration(noNovoTempo: string): void {
     this.formEvent.value.duration = noNovoTempo;
   }
-  sendDuration(){
-    this.eventService.sendDuration(this.formEvent.value).subscribe(response =>{
-      if(response.success){
+  sendDuration() {
+    this.eventService.sendDuration(this.formEvent.value).subscribe(response => {
+      if (response.success) {
         this.formEvent.value.duration = response.data
       }
-    }); 
+    });
   }
 }

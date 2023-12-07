@@ -7,7 +7,7 @@ import { RouterModule } from '@angular/router';
 import { FixedPluginModule } from './fixedplugin/fixedplugin.module';
 import { SpinnerComponent } from './spinner/spinner.component';
 import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
-import { CronometroComponent } from './cronometro/cronometro.component';
+import { CronometerComponent } from './cronometer/cronometer.component';
 
 
 
@@ -17,7 +17,7 @@ import { CronometroComponent } from './cronometro/cronometro.component';
     NavbarComponent,
     SidebarComponent,
     SpinnerComponent,
-    CronometroComponent
+    CronometerComponent
   ],
   imports: [
     CommonModule,
@@ -30,7 +30,7 @@ import { CronometroComponent } from './cronometro/cronometro.component';
     NavbarComponent,
     SidebarComponent,
     SpinnerComponent,
-    CronometroComponent
+    CronometerComponent
   ]
 })
 export class ThemeModule { }

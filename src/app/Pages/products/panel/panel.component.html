@@ -6,16 +6,18 @@
   <div class="main-panel">
     <app-navbar></app-navbar>
     <div class="content">
-      <div class="row">
-        <div class="col align-self-start">
-          <h5>Evento ativo: <i style="color: rgb(57, 141, 102);font-weight: bold;">{{this.formEvent.value.name}}</i>
-          </h5>
-          <div style="position: relative; z-index: 1000;">
-            <app-cronometro [hours]="this.hours" [minutes]="this.minutes" [seconds]="this.seconds"
-              (tempoAtualizado)="updateDuration($event)">
-            </app-cronometro>
-          </div>
+      <div *ngIf="this.formEvent.value.cashierStatus == 0">
+        <div class="row">
+          <div class="col align-self-start">
+            <h5>Evento ativo: <i style="color: rgb(57, 141, 102);font-weight: bold;">{{this.formEvent.value.name}}</i>
+            </h5>
+            <div style="position: relative; z-index: 1000;">
+              <app-cronometer [hours]="this.hours" [minutes]="this.minutes" [seconds]="this.seconds"
+                (tempoAtualizado)="updateDuration($event)">
+              </app-cronometer>
+            </div>
 
+          </div>
         </div>
       </div>
       <div class="row">
@@ -87,7 +89,8 @@
               </div>
               <div class="card-body">
                 <h5 class="card-title text-center">{{product.name}}</h5>
-                <p class="card-text text-center">{{product.description +" - R$"+ product.price}}</p>
+                <p class="card-text text-center" style="font-size: 1.2em; color: rgb(82, 79, 255); font-weight: bold;">R$ {{product.price}}</p>
+
                 <p class="card-text text-center statusActive" *ngIf="product.status == 'Ativo'">{{product.status}}</p>
                 <p class="card-text text-center statusInactive" *ngIf="product.status == 'Inativo'">{{product.status}}
                 </p>

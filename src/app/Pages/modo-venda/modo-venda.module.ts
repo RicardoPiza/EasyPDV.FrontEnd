@@ -14,7 +14,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { NgbPaginationModule, NgbToastModule } from '@ng-bootstrap/ng-bootstrap';
-import { CronometroComponent } from 'src/app/@core/shared/theme/cronometro/cronometro.component';
+import { CronometerComponent } from 'src/app/@core/shared/theme/cronometer/cronometer.component';
 
 
 @NgModule({
