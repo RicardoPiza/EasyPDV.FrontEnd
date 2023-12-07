@@ -1,0 +1,10 @@
+.durationTitle{
+    font-weight: bold;
+    color: rgb(248, 138, 75);
+    
+}
+.duration{
+    color: rgb(241, 76, 76);
+    font-weight: bold;
+    font-size: 1.2em;
+}

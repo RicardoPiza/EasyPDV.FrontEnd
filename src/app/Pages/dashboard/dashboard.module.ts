@@ -7,6 +7,7 @@ import { DetailsComponent } from './details/details.component';
 import { ThemeModule } from 'src/app/@core/shared/theme/theme.module';
 import { MatButtonModule } from '@angular/material/button';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import {MatTabsModule} from '@angular/material/tabs';
 
 
 @NgModule({
@@ -20,7 +21,8 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     ThemeModule,
     MatTableModule,
     MatButtonModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatTabsModule
   ],
   exports: [
     MatPaginator

@@ -2,38 +2,38 @@ import { Component, OnInit, OnDestroy, Output, EventEmitter, Input } from '@angu
 import { Subscription, interval } from 'rxjs';
 
 @Component({
-  selector: 'app-cronometro',
-  templateUrl: './cronometro.component.html',
-  styleUrls: ['./cronometro.component.css']
+  selector: 'app-cronometer',
+  templateUrl: './cronometer.component.html',
+  styleUrls: ['./cronometer.component.css']
 })
-export class CronometroComponent implements OnInit, OnDestroy {
+export class CronometerComponent implements OnInit, OnDestroy {
   @Input() hours!: number;
   @Input() minutes!: number;
   @Input() seconds!: number;
-  cronometroSubscription!: Subscription;
+  cronometerSubscription!: Subscription;
 
   @Output() tempoAtualizado: EventEmitter<string> = new EventEmitter<string>();
 
   constructor() { }
 
   ngOnInit(): void {
-    this.iniciarCronometro();
+    this.initCronometer();
   }
 
   ngOnDestroy(): void {
-    this.pararCronometro();
+    this.stopCronometer();
   }
 
   private timeFormat(hours: number, minutes: number, seconds: number): string {
-    return `${this.adicionarZeroEsquerda(hours)}:${this.adicionarZeroEsquerda(minutes)}:${this.adicionarZeroEsquerda(seconds)}`;
+    return `${this.addZeroToLeft(hours)}:${this.addZeroToLeft(minutes)}:${this.addZeroToLeft(seconds)}`;
   }
 
-  private adicionarZeroEsquerda(valor: number): string {
+  private addZeroToLeft(valor: number): string {
     return valor < 10 ? `0${valor}` : valor.toString();
   }
 
-  iniciarCronometro(): void {
-    this.cronometroSubscription = interval(1000).subscribe(() => {
+  initCronometer(): void {
+    this.cronometerSubscription = interval(1000).subscribe(() => {
       this.seconds++;
       if (this.seconds == 60) {
         this.minutes++;
@@ -47,18 +47,18 @@ export class CronometroComponent implements OnInit, OnDestroy {
     });
   }
 
-  pararCronometro(): void {
-    if (this.cronometroSubscription) {
-      this.cronometroSubscription.unsubscribe();
+  stopCronometer(): void {
+    if (this.cronometerSubscription) {
+      this.cronometerSubscription.unsubscribe();
     }
   }
 
-  reiniciarCronometro(): void {
-    this.pararCronometro();
+  restartCronometer(): void {
+    this.stopCronometer();
     this.seconds = 0;
     this.minutes = 0;
     this.hours = 0;
-    this.iniciarCronometro();
+    this.initCronometer();
   }
   getFormatedTime(): string {
     return this.timeFormat(this.hours, this.minutes, this.seconds);

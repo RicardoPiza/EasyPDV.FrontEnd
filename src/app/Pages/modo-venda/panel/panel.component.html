@@ -13,12 +13,12 @@
                                 style="color: rgb(57, 141, 102);font-weight: bold;">{{this.formEvent.value.name}}</i>
                         </h5>
                         <div style="position: relative; z-index: 1000;">
-                            <app-cronometro 
+                            <app-cronometer 
                             [hours]="this.hours" 
                             [minutes]="this.minutes" 
                             [seconds]="this.seconds"
                             (tempoAtualizado)="updateDuration($event)">
-                            </app-cronometro>
+                            </app-cronometer>
                         </div>
 
                     </div>
@@ -164,7 +164,7 @@
                 <div class="row row-cols-2 row-cols-md-5 align-self-center">
                     <div class="col mt-2" *ngFor="let product of data;let i = index ">
                         <form [formGroup]="formProduct">
-                            <div class="card card-product" (click)="sumItem(product.id)">
+                            <div class="card card-product">
                                 <div class="row text-center">
                                     <div class="col">
                                         <img class="card-img-top" [src]="'data:image/*;base64,' + product.image"

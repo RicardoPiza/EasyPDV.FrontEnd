@@ -3,6 +3,7 @@ import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } fr
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
+import { MatTabChangeEvent } from '@angular/material/tabs';
 import { AuthService } from '@auth0/auth0-angular';
 import { Chart } from 'chart.js/auto';
 import { EventService } from 'src/app/@core/services/event.service';
@@ -36,6 +37,9 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public hours: number = 0;
   public minutes: number = 0;
   public seconds: number = 0;
+  public selectedTabIndex = 0;
+  private productsChart!: any;
+  private eventsChart!: Chart;
 
   constructor(
     private saleService: SaleService,
@@ -50,25 +54,37 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     this.isPageLoaded = this.loadingService.getLoading();
   }
   ngOnDestroy(): void {
-    this.sendDuration();
+    if (this.formEvent.value.cashierStatus == 0)
+      this.sendDuration();
   }
   ngAfterViewInit(): void {
     this.getEvent();
   }
 
+  onLinkClick(event: MatTabChangeEvent) {
+    if (event.index <= 0) {
+      const ctxProducts = document.getElementById('productsChart') as HTMLCanvasElement;
+      this.buildChart(ctxProducts);
+    }
 
+    if (event.index == 1) {
+      const ctxEvents = document.getElementById('eventsChart') as HTMLCanvasElement;
+      this.buildEventChart(ctxEvents);
+    }
+  }
   ngOnInit() {
 
     this.formEvent = this.formBuilder.group({
       id: ['00000000-0000-0000-0000-000000000000'],
       name: [''],
-      cashierStatus: [],
+      cashierStatus: [0],
       balance: [0],
       sales: [[]],
       date: [Date],
       duration: [''],
       responsible: ['']
     });
+    this.selectedTabIndex = 0;
 
   }
 
@@ -93,58 +109,76 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
               this.chartData = response.data;
               this.displayedColumns = ['productName', 'price', 'quantitySold', 'saleTotal']
               this.loadingService.setLoading(false);
-              this.buildChart();
+              if (this.selectedTabIndex == 0) {
+                const ctxProducts = document.getElementById('productsChart') as HTMLCanvasElement;
+                this.buildChart(ctxProducts);
+              } if (this.selectedTabIndex == 1) {
+                const ctxEvents = document.getElementById('eventsChart') as HTMLCanvasElement;
+                this.buildEventChart(ctxEvents);
+              }
             }
 
           } else {
             this.loadingService.setLoading(false);
           }
         });
-        this.eventService.getEventReport(_response.data.responsible).subscribe((_response) => {
-          if (_response.success) {
-            this.eventDisplayedColumns = ['name', 'totalProfit', 'initialBalance', 'duration', 'created']
-            this.eventDataSource = new MatTableDataSource<EventPeriodicElement>(_response.data);
-            _response.data.forEach((element: any) => {
-              element.created = formatDate(element.created, 'dd/MM/yyyy', 'en-US');
-            });
-            this.eventChartData = _response.data;
-            this.buildEventChart();
-          }
-        });
+        if (_response.data.id != '00000000-0000-0000-0000-000000000000') {
+          this.eventService.getEventReport(_response.data.responsible).subscribe((_response) => {
+            if (_response.success) {
+              this.eventDisplayedColumns = ['name', 'totalProfit', 'initialBalance', 'duration', 'created']
+              this.eventDataSource = new MatTableDataSource<EventPeriodicElement>(_response.data);
+              _response.data.forEach((element: any) => {
+                element.created = formatDate(element.created, 'dd/MM/yyyy', 'en-US');
+              });
+              this.eventChartData = _response.data;
+            }
+          });
+        } else {
+          this.loadingService.setLoading(false);
+        }
       } else {
         this.loadingService.setLoading(false);
       }
     });
   }
-  buildChart() {
-    this.chartColor = "#FFFFFF";
-    const ctx: any = document.getElementById('productsChart');
-    new Chart(ctx, {
-      type: 'doughnut',
-      data: {
-        labels: this.chartData.map((x: any) => x.productName),
-        datasets: [{
-          label: this.chartData.map((x: any) => x.productName),
-          data: this.chartData.map((x: any) => x.quantitySold),
-          backgroundColor: this.chartData.map((x: any) => x.barColor),
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          y: {
-            beginAtZero: true
+  buildChart(ctx: any) {
+
+    if (this.productsChart) {
+      this.productsChart.destroy();
+    }
+
+    if (this.formEvent.value.cashierStatus == 0) {
+      this.chartColor = "#FFFFFF";
+      this.productsChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: this.chartData.map((x: any) => x.productName),
+          datasets: [{
+            label: this.chartData.map((x: any) => x.productName),
+            data: this.chartData.map((x: any) => x.quantitySold),
+            backgroundColor: this.chartData.map((x: any) => x.barColor),
+            hoverOffset: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true
+            }
           }
         }
-      }
-    });
+      });
+    }
   }
 
-  buildEventChart() {
+  buildEventChart(ctx: any) {
+
+    if (this.eventsChart) {
+      this.eventsChart.destroy();
+    }
     this.chartColor = "#FFFFFF";
-    const ctx: any = document.getElementById('eventsChart');
-    new Chart(ctx, {
+    this.eventsChart = new Chart(ctx, {
       type: 'bar',
       data: {
         labels: this.eventChartData.map((x: any) => x.name),
@@ -185,12 +219,12 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   updateDuration(noNovoTempo: string): void {
     this.formEvent.value.duration = noNovoTempo;
   }
-  sendDuration(){
-    this.eventService.sendDuration(this.formEvent.value).subscribe(response =>{
-      if(response.success){
+  sendDuration() {
+    this.eventService.sendDuration(this.formEvent.value).subscribe(response => {
+      if (response.success) {
         this.formEvent.value.duration = response.data
       }
-    }); 
+    });
   }
 }
 export interface SalesPeriodicElement {

@@ -14,7 +14,7 @@ import { AuthService } from '@auth0/auth0-angular';
   templateUrl: './panel.component.html',
   styleUrls: ['./panel.component.css']
 })
-export class PanelComponent implements OnInit, OnDestroy{
+export class PanelComponent implements OnInit, OnDestroy {
 
   public page = 1;
   public total = 0.0;
@@ -53,7 +53,8 @@ export class PanelComponent implements OnInit, OnDestroy{
     });
   }
   ngOnDestroy(): void {
-    this.sendDuration();
+    if (this.formEvent.value.cashierStatus == 0)
+      this.sendDuration();
   }
 
   ngAfterViewInit(): void {
@@ -150,7 +151,6 @@ export class PanelComponent implements OnInit, OnDestroy{
     this.formEvent.value.responsible = this.accountName;
     this.formEvent.value.sales.push(this.form.value);
     this.form.value.SoldProducts = this.activeChosenProducts;
-    this.loadingService.setLoading(true);
     this.saleService.postSale(this.formEvent.value)
       .subscribe((result) => {
         if (result.success) {
@@ -235,7 +235,7 @@ export class PanelComponent implements OnInit, OnDestroy{
 
   startEvent() {
     this.formEvent.value.responsible = this.accountName;
-    this.formEvent.value.duration = '0';
+    this.formEvent.value.duration = '00:00:00';
     this.eventService.startEvent(this.formEvent.value).subscribe(_response => {
       if (_response) {
         this.formEvent.patchValue(_response);
@@ -259,6 +259,7 @@ export class PanelComponent implements OnInit, OnDestroy{
         this.formEvent.patchValue(response);
         this.modalService.dismissAll();
         this.loadingService.setLoading(false);
+        window.location.reload();
 
       });
     this.loadingService.setLoading(false);
@@ -271,6 +272,8 @@ export class PanelComponent implements OnInit, OnDestroy{
         this.minutes = parseInt(_duration[1]);
         this.seconds = parseInt(_duration[2]);
         this.formEvent.patchValue(_response.data);
+        this.loadingService.setLoading(false);
+
         this.loadingService.setLoading(false);
       } else {
         this.toastr.error('Evento não encontrado');
@@ -298,11 +301,11 @@ export class PanelComponent implements OnInit, OnDestroy{
   updateDuration(noNovoTempo: string): void {
     this.formEvent.value.duration = noNovoTempo;
   }
-  sendDuration(){
-    this.eventService.sendDuration(this.formEvent.value).subscribe(response =>{
-      if(response.success){
+  sendDuration() {
+    this.eventService.sendDuration(this.formEvent.value).subscribe(response => {
+      if (response.success) {
         this.formEvent.value.duration = response.data
       }
-    }); 
+    });
   }
 }
