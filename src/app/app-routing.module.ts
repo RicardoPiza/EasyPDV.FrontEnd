@@ -13,8 +13,8 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'modo-venda',
-    loadChildren: () => import('./Pages/modo-venda/modo-venda.module').then(m => m.ModoVendaModule), 
+    path: 'sale-mode',
+    loadChildren: () => import('./Pages/sale-mode/sale-mode.module').then(m => m.SaleModeModule), 
     canActivate: [AuthGuard]
   },
   {

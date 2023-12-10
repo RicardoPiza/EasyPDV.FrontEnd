@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModoVendaRoutingModule } from './modo-venda-routing.module';
+import { SaleModeRoutingModule } from './sale-mode-routing.module';
 import { PanelComponent } from './panel/panel.component';
 import { DetailsComponent } from './details/details.component';
 import { ThemeModule } from 'src/app/@core/shared/theme/theme.module';
@@ -24,7 +24,7 @@ import { CronometerComponent } from 'src/app/@core/shared/theme/cronometer/crono
   ],
   imports: [
     CommonModule,
-    ModoVendaRoutingModule,
+    SaleModeRoutingModule,
     ThemeModule,
     CommonModule,
     ProductsRoutingModule,
@@ -42,4 +42,4 @@ import { CronometerComponent } from 'src/app/@core/shared/theme/cronometer/crono
 
   ]
 })
-export class ModoVendaModule { }
+export class SaleModeModule { }

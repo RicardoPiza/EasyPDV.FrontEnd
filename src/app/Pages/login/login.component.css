@@ -1,0 +1,11 @@
+div {
+    text-align: center;
+}
+.enter{
+    padding-top: 50px;
+}
+.container-fluid{
+    height: 100vh;
+    width:  100vw;
+    background: linear-gradient(72deg, rgb(0, 50, 73) 0%, rgb(9, 117, 121) 35%, rgb(115, 220, 241) 100%);
+}

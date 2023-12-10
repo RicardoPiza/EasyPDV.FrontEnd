@@ -49,7 +49,7 @@ export class PanelComponent implements OnInit, OnDestroy {
   ) {
     config.backdrop = 'static';
     this.authService.user$.subscribe(user => {
-      this.accountName = user?.name;
+      this.accountName = user?.email;
     });
   }
   ngOnDestroy(): void {
@@ -92,7 +92,7 @@ export class PanelComponent implements OnInit, OnDestroy {
         this.getEvent();
       });
     this.authService.user$.subscribe(user => {
-      this.accountName = user?.name;
+      this.accountName = user?.email;
     });
 
   }
