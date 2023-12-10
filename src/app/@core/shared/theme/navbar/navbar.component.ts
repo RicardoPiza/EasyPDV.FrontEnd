@@ -13,6 +13,7 @@ export class NavbarComponent {
   private listTitles: any[] = [];
   location: Location;
   public accountName: any;
+  public accountPicture: any;
   private nativeElement: Node;
   private toggleButton: any;
   private sidebarVisible: boolean;
@@ -37,6 +38,7 @@ export class NavbarComponent {
     var navbar: HTMLElement = this.element.nativeElement;
     this.authService.user$.subscribe(user => {
       this.accountName = user?.name;
+      this.accountPicture = user?.picture;
     });
     this.toggleButton = navbar.getElementsByClassName('navbar-toggle')[0];
     this.router.events.subscribe((event) => {

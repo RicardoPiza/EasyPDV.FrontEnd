@@ -49,7 +49,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     private loadingService: LoaderService,
   ) {
     this.authService.user$.subscribe(user => {
-      this.accountName = user?.name;
+      this.accountName = user?.email;
     });
     this.isPageLoaded = this.loadingService.getLoading();
   }
@@ -183,7 +183,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
       data: {
         labels: this.eventChartData.map((x: any) => x.name),
         datasets: [{
-          label: this.eventChartData.map((x: any) => x.name),
+          label: 'Eventos realizados',
           data: this.eventChartData.map((x: any) => x.totalProfit),
           backgroundColor: this.eventChartData.map((x: any) => x.barColor),
         }]
@@ -194,7 +194,8 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
           x: {
             beginAtZero: true
           }
-        }
+        },
+        
       }
     });
   }

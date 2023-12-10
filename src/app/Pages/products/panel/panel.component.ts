@@ -41,7 +41,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   ) {
     config.backdrop = 'static';
     this.authService.user$.subscribe(user => {
-      this.accountName = user?.name;
+      this.accountName = user?.email;
     });
   }
   ngOnDestroy(): void {

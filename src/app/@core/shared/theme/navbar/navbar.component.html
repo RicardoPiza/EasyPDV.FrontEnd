@@ -8,15 +8,12 @@
           <span class="navbar-toggler-bar bar3"></span>
         </button>
       </div>
-      <a class="navbar-brand" href="javascript:void(0)">{{getTitle()}}</a>
     </div>
-    <button class="navbar-toggler" type="button" (click)="collapse()"
-      [attr.aria-expanded]="!isCollapsed" aria-controls="collapseExample">
-      <span class="navbar-toggler-bar navbar-kebab"></span>
-      <span class="navbar-toggler-bar navbar-kebab"></span>
-      <span class="navbar-toggler-bar navbar-kebab"></span>
-    </button>
-    <label class="nav-item mr-3">Welcome {{accountName}}</label>
+    <div class="col align-self-center" >
+      <img [src]="this.accountPicture" alt="" width="40px" height="40px" style="margin-right: 10px; 
+      border-radius: 20px;">
+      <label class="nav-item mr-3">Bem-vindo</label> <b>  {{accountName}}</b>
+    </div>
     <div class="collapse navbar-collapse justify-content-end" id="collapseExample" ngbCollapse="isCollapsed">
       <form>
         <div class="input-group no-border">
@@ -38,7 +35,7 @@
           </a>
         </li>
         <li class="nav-item btn-rotate" ngbDropdown placement="bottom-left">
-          <a class="nav-link" ngbDropdownToggle id="navbarDropdownMenuLink" >
+          <a class="nav-link" ngbDropdownToggle id="navbarDropdownMenuLink">
             <i class="nc-icon nc-bell-55"></i>
             <p>
               <span class="d-lg-none d-md-block">Some Actions</span>
