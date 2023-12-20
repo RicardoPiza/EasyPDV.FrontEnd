@@ -20,6 +20,10 @@ export class EventService {
   getEvent(parameters: any): Observable<any> {
     return this.securityRequestService.get(`${environment.webAppApi}/Event/GetEvent/${parameters}`);
   }
+  
+  get(id: any): Observable<any> {
+    return this.securityRequestService.get(`${environment.webAppApi}/Event/Get/${id}`);
+  }
   addSale(parameters: any): Observable<any> {
     return this.securityRequestService.post(`${environment.webAppApi}/Event/AddSale`, parameters);
   }

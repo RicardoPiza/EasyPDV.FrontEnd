@@ -1,8 +1,10 @@
+import { animate, state, style, transition, trigger } from '@angular/animations';
 import { formatDate } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
-import { MatTableDataSource } from '@angular/material/table';
+import { MatSort } from '@angular/material/sort';
+import { MatTable, MatTableDataSource } from '@angular/material/table';
 import { MatTabChangeEvent } from '@angular/material/tabs';
 import { AuthService } from '@auth0/auth0-angular';
 import { Chart } from 'chart.js/auto';
@@ -14,7 +16,14 @@ import * as XLSX from 'xlsx';
 @Component({
   selector: 'app-panel',
   templateUrl: './panel.component.html',
-  styleUrls: ['./panel.component.css']
+  styleUrls: ['./panel.component.css'],
+  animations: [
+    trigger('detailExpand', [
+      state('collapsed', style({ height: '0px', minHeight: '0' })),
+      state('expanded', style({ height: '*' })),
+      transition('expanded <=> collapsed', animate('225ms cubic-bezier(0.4, 0.0, 0.2, 1)')),
+    ]),
+  ],
 })
 
 export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
@@ -23,15 +32,23 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public chartHours: any;
   public chartData: any = [];
   public eventChartData: any = [];
+  public saleData: SalePeriodicElement[] = [];
   public formEvent!: UntypedFormGroup;
   public accountName: any;
   public dataSource: any;
   public eventDataSource: any;
+  public salesDataSource: any
   public displayedColumns: string[] = [];
   public eventDisplayedColumns: string[] = [];
+  public salesDisplayedColumns: string[] = [];
+  public innerDisplayedColumns: string[] = [];
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild('TABLE') table!: ElementRef;
   @ViewChild('EVENTTABLE') eventTable!: ElementRef;
+  @ViewChild('SALESTABLE') salesTable!: ElementRef;
+  @ViewChildren('innerTables') innerTables!: QueryList<MatTable<SoldProduct>>;
+  @ViewChildren('innerSort') innerSort!: QueryList<MatSort>;
+  @ViewChild('outerSort', { static: true }) sort!: MatSort;
   public hasData: boolean = true;
   public isPageLoaded: boolean = true;
   public hours: number = 0;
@@ -40,6 +57,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public selectedTabIndex = 0;
   private productsChart!: any;
   private eventsChart!: Chart;
+  public expandedSales?: SalePeriodicElement | null;
 
   constructor(
     private saleService: SaleService,
@@ -47,6 +65,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     private eventService: EventService,
     public authService: AuthService,
     private loadingService: LoaderService,
+    private cd: ChangeDetectorRef
   ) {
     this.authService.user$.subscribe(user => {
       this.accountName = user?.email;
@@ -96,7 +115,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
         this.minutes = parseInt(_duration[1]);
         this.seconds = parseInt(_duration[2]);
         this.formEvent.patchValue(_response.data);
-        this.saleService.getReport(_response.data.responsible, _response.data.id).subscribe(response => {
+        this.saleService.getSoldProductsReport(_response.data.responsible, _response.data.id).subscribe(response => {
 
           if (response.success) {
 
@@ -104,7 +123,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
               this.hasData = false;
               this.loadingService.setLoading(false);
             } else {
-              this.dataSource = new MatTableDataSource<SalesPeriodicElement>(response.data);
+              this.dataSource = new MatTableDataSource<SoldProductsPeriodicElement>(response.data);
               this.dataSource.paginator = this.paginator;
               this.chartData = response.data;
               this.displayedColumns = ['productName', 'price', 'quantitySold', 'saleTotal']
@@ -130,11 +149,34 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
               _response.data.forEach((element: any) => {
                 element.created = formatDate(element.created, 'dd/MM/yyyy', 'en-US');
               });
+              this.displayedColumns = ['productName', 'price', 'quantitySold', 'saleTotal']
               this.eventChartData = _response.data;
             }
           });
         } else {
           this.loadingService.setLoading(false);
+        }
+
+        if (_response.data.id != '00000000-0000-0000-0000-000000000000') {
+          this.eventService.get(_response.data.id).subscribe((response) => {
+            if (response.success) {
+              response.data.sales.forEach((element: any) => {
+                element.saleDate = formatDate(element.saleDate, 'dd/MM/yyyy', 'en-US');
+              });
+              this.salesDisplayedColumns = ['id', 'salePrice', 'saleDate', 'paymentMethod'];
+              this.innerDisplayedColumns = ['description','id','name', 'price','productQuantity', 'status','stockQuantity'];
+
+              response.data.sales.forEach((sale: any) => {
+                if (sale.soldProducts && Array.isArray(sale.soldProducts) && sale.soldProducts.length) {
+                  this.saleData = [...this.saleData, {...sale, soldProducts: new MatTableDataSource(sale.soldProducts)}];
+                } else {
+                  this.saleData = [...this.saleData, sale];
+                }
+              });
+              this.salesDataSource = new MatTableDataSource(this.saleData);
+              this.salesDataSource.sort = this.sort;
+            }
+          });
         }
       } else {
         this.loadingService.setLoading(false);
@@ -195,7 +237,7 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
             beginAtZero: true
           }
         },
-        
+
       }
     });
   }
@@ -217,6 +259,15 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
     XLSX.writeFile(wb, `${this.formEvent.value.name} ${this.formEvent.value.date}.xlsx`);
 
   }
+  exportSalesAsExcel() {
+    const ws: XLSX.WorkSheet = XLSX.utils.table_to_sheet(this.salesTable.nativeElement);//converts a DOM TABLE element to a worksheet
+    const wb: XLSX.WorkBook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Info. vendas');
+
+    /* save to file */
+    XLSX.writeFile(wb, `${this.formEvent.value.name} ${this.formEvent.value.date}.xlsx`);
+
+  }
   updateDuration(noNovoTempo: string): void {
     this.formEvent.value.duration = noNovoTempo;
   }
@@ -227,12 +278,30 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     });
   }
+  toggleRow(row: SalePeriodicElement) {
+    row.soldProducts && (row.soldProducts as MatTableDataSource<SoldProduct>).data.length ? (this.expandedSales = this.expandedSales === row ? null : row) : null;
+    this.cd.detectChanges();
+    this.innerTables.forEach((table, index) => (table.dataSource as MatTableDataSource<SoldProduct>).sort = this.innerSort.toArray()[index]);
+  }
+  applyFilter(event: any) {
+    let filterValue = event.target.value;
+    this.innerTables.forEach((table, index) => (table.dataSource as MatTableDataSource<SoldProduct>).filter = filterValue.trim().toLowerCase());
+  }
 }
-export interface SalesPeriodicElement {
+export interface SoldProductsPeriodicElement {
   productName: any;
   price: any;
   quantitySold: any;
   saleTotal: any;
+}
+export interface SoldProduct {
+  description: any;
+  id: any;
+  name: any;
+  price: any;
+  productQuantity: any;
+  status: any;
+  stockQuantity: any;
 }
 export interface EventPeriodicElement {
   name: any;
@@ -241,3 +310,11 @@ export interface EventPeriodicElement {
   duration: any;
   created: any;
 }
+export interface SalePeriodicElement {
+  id: any;
+  soldProducts?: SoldProduct[] | MatTableDataSource<SoldProduct>;
+  salePrice: any;
+  saleDate: any;
+  paymentMethod: any;
+}
+
