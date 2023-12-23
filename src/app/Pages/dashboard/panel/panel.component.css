@@ -39,7 +39,8 @@ tr.example-detail-row {
 }
 
 tr.example-element-row:not(.example-expanded-row):hover {
-    background: #777;
+    background: #f3f3f3;
+    cursor: pointer;
 }
 
 tr.example-element-row:not(.example-expanded-row):active {
@@ -86,3 +87,4 @@ tr.example-element-row:not(.example-expanded-row):active {
     margin-top: 15px;
     width: 100%;
 }
+

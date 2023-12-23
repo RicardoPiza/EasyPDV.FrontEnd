@@ -164,11 +164,11 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
                 element.saleDate = formatDate(element.saleDate, 'dd/MM/yyyy', 'en-US');
               });
               this.salesDisplayedColumns = ['id', 'salePrice', 'saleDate', 'paymentMethod'];
-              this.innerDisplayedColumns = ['description','id','name', 'price','productQuantity', 'status','stockQuantity'];
+              this.innerDisplayedColumns = ['description', 'id', 'name', 'price', 'productQuantity', 'status', 'stockQuantity'];
 
               response.data.sales.forEach((sale: any) => {
                 if (sale.soldProducts && Array.isArray(sale.soldProducts) && sale.soldProducts.length) {
-                  this.saleData = [...this.saleData, {...sale, soldProducts: new MatTableDataSource(sale.soldProducts)}];
+                  this.saleData = [...this.saleData, { ...sale, soldProducts: new MatTableDataSource(sale.soldProducts) }];
                 } else {
                   this.saleData = [...this.saleData, sale];
                 }
@@ -286,6 +286,32 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   applyFilter(event: any) {
     let filterValue = event.target.value;
     this.innerTables.forEach((table, index) => (table.dataSource as MatTableDataSource<SoldProduct>).filter = filterValue.trim().toLowerCase());
+  }
+  translate(word: string) {
+    switch (word) {
+      case "description":
+        return "Descrição";
+      case "id":
+        return "Id";
+      case "name":
+        return "Nome do produto";
+      case "price":
+        return "Preço";
+      case "productQuantity":
+        return "Quantidade vendida";
+      case "status":
+        return "Status";
+      case "stockQuantity":
+        return "Quantidade em estoque"
+      case "salePrice":
+        return "Valor da venda"
+      case "saleDate":
+        return "Data Da Venda"
+      case "paymentMethod":
+        return "Meio de pagamento"
+      default: null
+    }
+    return null;
   }
 }
 export interface SoldProductsPeriodicElement {
