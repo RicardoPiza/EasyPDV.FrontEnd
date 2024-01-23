@@ -18,7 +18,13 @@ export class SaleService {
     return this.securityRequestService.post(`${environment.webAppApi}/Sale/MakeSale`, parameters);
   }
 
-  getReport(responsible: any, id: any): Observable<any> {
-    return this.securityRequestService.get(`${environment.webAppApi}/Sale/GetReport/${responsible}/${id}`);
+  getSoldProductsReport(responsible: any, id: any): Observable<any> {
+    return this.securityRequestService.get(`${environment.webAppApi}/Sale/GetSoldProductsReport/${responsible}/${id}`);
+  }
+  getSalesReport(responsible: any, id: any): Observable<any> {
+    return this.securityRequestService.get(`${environment.webAppApi}/Sale/GetSalesReport/${responsible}/${id}`);
+  }
+  getSales(responsible: any, id: any): Observable<any> {
+    return this.securityRequestService.get(`${environment.webAppApi}/Sale/GetSales/${responsible}/${id}`);
   }
 }
