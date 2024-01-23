@@ -12,6 +12,8 @@ import { EventService } from 'src/app/@core/services/event.service';
 import { SaleService } from 'src/app/@core/services/sale.service';
 import { LoaderService } from 'src/app/@core/shared/services/loader.service';
 import * as XLSX from 'xlsx';
+import { SoldProductsDashboardComponent } from '../components/sold-products-dashboard/sold-products-dashboard.component';
+import { EventsDashboardComponent } from '../components/events-dashboard/events-dashboard.component';
 
 @Component({
   selector: 'app-panel',
@@ -46,6 +48,8 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild('TABLE') table!: ElementRef;
   @ViewChild('EVENTTABLE') eventTable!: ElementRef;
   @ViewChild('SALESTABLE') salesTable!: ElementRef;
+  @ViewChild('productDashboard') productDashboard!: SoldProductsDashboardComponent;
+  @ViewChild('eventsDashboard') eventsDashboard!: EventsDashboardComponent;
   @ViewChildren('innerTables') innerTables!: QueryList<MatTable<SoldProduct>>;
   @ViewChildren('innerSort') innerSort!: QueryList<MatSort>;
   @ViewChild('outerSort', { static: true }) sort!: MatSort;
@@ -56,7 +60,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
   public seconds: number = 0;
   public selectedTabIndex = 0;
   private productsChart!: any;
-  private eventsChart!: Chart;
   public expandedSales?: SalePeriodicElement | null;
 
   constructor(
@@ -82,13 +85,13 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onLinkClick(event: MatTabChangeEvent) {
     if (event.index <= 0) {
-      const ctxProducts = document.getElementById('productsChart') as HTMLCanvasElement;
-      this.buildChart(ctxProducts);
+      this.productDashboard.destroy()
+      this.productDashboard.buildChart(this.chartData);
     }
 
     if (event.index == 1) {
-      const ctxEvents = document.getElementById('eventsChart') as HTMLCanvasElement;
-      this.buildEventChart(ctxEvents);
+      this.eventsDashboard.destroy();
+      this.eventsDashboard.buildChart(this.eventChartData);
     }
   }
   ngOnInit() {
@@ -129,11 +132,9 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
               this.displayedColumns = ['productName', 'price', 'quantitySold', 'saleTotal']
               this.loadingService.setLoading(false);
               if (this.selectedTabIndex == 0) {
-                const ctxProducts = document.getElementById('productsChart') as HTMLCanvasElement;
-                this.buildChart(ctxProducts);
-              } if (this.selectedTabIndex == 1) {
-                const ctxEvents = document.getElementById('eventsChart') as HTMLCanvasElement;
-                this.buildEventChart(ctxEvents);
+                this.productDashboard.buildChart(this.chartData);
+              } else if (this.selectedTabIndex == 1) {
+                this.eventsDashboard.buildChart(this.eventChartData);
               }
             }
 
@@ -163,8 +164,8 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
               response.data.sales.forEach((element: any) => {
                 element.saleDate = formatDate(element.saleDate, 'dd/MM/yyyy', 'en-US');
               });
-              this.salesDisplayedColumns = ['id', 'salePrice', 'saleDate', 'paymentMethod'];
-              this.innerDisplayedColumns = ['description', 'id', 'name', 'price', 'productQuantity', 'status', 'stockQuantity'];
+              this.salesDisplayedColumns = ['id', 'salePrice', 'saleDate', 'paymentMethod', 'print'];
+              this.innerDisplayedColumns = ['description', 'id', 'name', 'price', 'productQuantity', 'status', 'stockQuantity', 'print'];
 
               response.data.sales.forEach((sale: any) => {
                 if (sale.soldProducts && Array.isArray(sale.soldProducts) && sale.soldProducts.length) {
@@ -180,64 +181,6 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       } else {
         this.loadingService.setLoading(false);
-      }
-    });
-  }
-  buildChart(ctx: any) {
-
-    if (this.productsChart) {
-      this.productsChart.destroy();
-    }
-
-    if (this.formEvent.value.cashierStatus == 0) {
-      this.chartColor = "#FFFFFF";
-      this.productsChart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: this.chartData.map((x: any) => x.productName),
-          datasets: [{
-            label: this.chartData.map((x: any) => x.productName),
-            data: this.chartData.map((x: any) => x.quantitySold),
-            backgroundColor: this.chartData.map((x: any) => x.barColor),
-            hoverOffset: 4
-          }]
-        },
-        options: {
-          responsive: true,
-          scales: {
-            y: {
-              beginAtZero: true
-            }
-          }
-        }
-      });
-    }
-  }
-
-  buildEventChart(ctx: any) {
-
-    if (this.eventsChart) {
-      this.eventsChart.destroy();
-    }
-    this.chartColor = "#FFFFFF";
-    this.eventsChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: this.eventChartData.map((x: any) => x.name),
-        datasets: [{
-          label: 'Eventos realizados',
-          data: this.eventChartData.map((x: any) => x.totalProfit),
-          backgroundColor: this.eventChartData.map((x: any) => x.barColor),
-        }]
-      },
-      options: {
-        responsive: true,
-        scales: {
-          x: {
-            beginAtZero: true
-          }
-        },
-
       }
     });
   }
@@ -312,6 +255,10 @@ export class PanelComponent implements OnInit, AfterViewInit, OnDestroy {
       default: null
     }
     return null;
+  }
+  printTickets(value: any) {
+    window.print();
+    console.log(value)
   }
 }
 export interface SoldProductsPeriodicElement {

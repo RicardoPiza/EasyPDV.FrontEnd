@@ -11,12 +11,19 @@ import {MatTabsModule} from '@angular/material/tabs';
 import { MatSortModule } from '@angular/material/sort';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { SoldProductsDashboardComponent } from './components/sold-products-dashboard/sold-products-dashboard.component';
+import { SalesDashboardComponent } from './components/sales-dashboard/sales-dashboard.component';
+import { EventsDashboardComponent } from './components/events-dashboard/events-dashboard.component';
+import { MatIconModule } from '@angular/material/icon';
 
 
 @NgModule({
   declarations: [
     PanelComponent,
-    DetailsComponent
+    DetailsComponent,
+    SoldProductsDashboardComponent,
+    SalesDashboardComponent,
+    EventsDashboardComponent
   ],
   imports: [
     CommonModule,
@@ -27,6 +34,7 @@ import { MatInputModule } from '@angular/material/input';
     MatTabsModule,
     MatButtonModule,
     MatPaginatorModule,
+    MatIconModule,
     MatFormFieldModule,
     MatInputModule
   ],
